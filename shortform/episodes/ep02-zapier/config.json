@@ -15,7 +15,7 @@
 
   "before": {
     "words": ["받고", "옮기고", "붙이고", "알리고", "다시"],
-    "background": { "color": "#101012", "dim": 0 }
+    "background": { "src": "assets/stock/pexels-7429487-cottonbro.mp4", "start": 13.0, "dim": 0.42, "blur": 1, "saturation": 0.55 }
   },
 
   "turn": {
@@ -36,7 +36,8 @@
   },
 
   "close": {
-    "lines": ["어느 순간에도,", "업무는 이어져야 하니까."]
+    "lines": ["어느 순간에도,", "업무는 이어져야 하니까."],
+    "background": { "src": "assets/stock/pexels-6632967-cup-of-couple.mp4", "start": 2.6, "dim": 0.28, "blur": 1, "saturation": 0.6 }
   },
 
   "end": {

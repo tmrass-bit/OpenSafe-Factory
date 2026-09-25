@@ -29,3 +29,13 @@
 | PROOF (Trigger → Action → Action) | Zapier 공식 Help Center · "Zaps quick start guide" · https://help.zapier.com/hc/en-us/articles/22234847450893-Zaps-quick-start-guide · 원본 이미지 alt="Zap editor layout" (cdn.zappy.app/babd482c8371899f1b7663d4d6b575d2.png) | `assets/official/proof-trigger-action-action.png` · 2026-09-25 다운로드 | 공식 스크린샷 원본에서 위쪽 3단계(1. New Form Response in Google Forms → 2. Create Spreadsheet Row in Google Sheets → 3. Create Draft in Gmail)만 **크롭**. 픽셀 합성·텍스트 추가 없음. 원본은 전체 12단계 Zap 이었고 뒤쪽 Paths 분기는 이 영상 스코프(Trigger→Action→Action)에 불필요해 제외 |
 
 ※ 두 asset 모두 Zapier 소유 자산이며, 이 프로젝트가 Zapier 공식 의뢰가 아니라면 광고 제작·배포 전 Zapier 브랜드 가이드라인(https://brand.zapier.com/) 상 사용 승인 여부를 확인해야 한다 (PREPRODUCTION 문서에 이미 명시된 사항).
+
+### ep02-zapier — Pexels 실사 footage (EP01과 별도로 확보한, 이 편 전용 소스)
+
+| 구분 | 소스 | 파일 | 비고 |
+|---|---|---|---|
+| CLOSE 배경 | Pexels · "A Person Putting Sticky Notes on a Wall" · 촬영 **Cup of Couple** · https://www.pexels.com/video/a-person-putting-sticky-notes-on-a-wall-6632967/ · 1080×1920, 9.68초 중 2.6~3.0초 구간(손이 빠지고 메모만 남는 순간) 사용 · 2026-09-25 다운로드 | `assets/stock/pexels-6632967-cup-of-couple.mp4` | Pexels License. EP01과 무관한 이 편 전용 확보 소스 |
+| BEFORE 배경 | Pexels · "Person Sticking Sticky Notes on a Whiteboard" · 촬영 **cottonbro studio** · https://www.pexels.com/video/person-sticking-sticky-notes-on-a-whiteboard-7429487/ · 2732×1440, 35초 중 13.0~13.8초 구간 사용 · 2026-09-25 다운로드 | `assets/stock/pexels-7429487-cottonbro.mp4` | Pexels License. EP01과 무관한 이 편 전용 확보 소스 |
+
+※ AFTER 배경은 EP01 footage(`pexels-6177738-cup-of-couple.mp4`)를 임시로 재사용했다가 제거함 — 이 편 전용 새 source로 교체 예정(별도 후보 검토 중, 미확정).
+※ Pexels 라이선스 준수 메모(위 "Pexels 라이선스 준수 메모" 섹션)는 이 두 클립에도 동일하게 적용 — 손만 나오는 구도, 식별 가능한 인물 없음.

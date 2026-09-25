@@ -29,7 +29,7 @@
 </head>
 <body>
 <div id="stage"></div>
-<script>window.CONFIG={"_comment":"Zapier 편. engine/template_minimal.html 전용 config — EP01 스키마(hook/turn.modules/after.lanes 등)와 다르다.","episode":"ep02-zapier","title":"Zapier — 업무가 끊기는 순간","template":"minimal","fps":30,"duration":23,"brand":{"name":"Zapier","accent":"#FF4A00"},"open":{"text":"업무가 끊기는 순간.","background":{"color":"#0b0b0d","dim":0}},"before":{"words":["받고","옮기고","붙이고","알리고","다시"],"background":{"color":"#101012","dim":0}},"turn":{"lines":["업무가 끊기는 곳은, 앱과 앱 사이.","그 사이를, 사람이 메우고 있었습니다."]},"proof":{"image":"file:///home/user/OpenSafe-Factory/shortform/assets/official/proof-trigger-action-action.png","steps":["Trigger","Action","Action"]},"after":{"words":["받고","잇고","닿고","다음"],"background":{"color":"#0d1116","dim":0}},"close":{"lines":["어느 순간에도,","업무는 이어져야 하니까."]},"end":{"wordmark":"Zapier","logo":"file:///home/user/OpenSafe-Factory/shortform/assets/official/zapier-logo-frost.svg"},"timeline":{"open":0,"before":1.8,"turn":5.8,"proof":8.6,"after":12,"close":16.4,"end":20.6,"total":23}};window.BG={};window.AUDIO_SRC='music.wav';</script>
+<script>window.CONFIG={"_comment":"Zapier 편. engine/template_minimal.html 전용 config — EP01 스키마(hook/turn.modules/after.lanes 등)와 다르다.","episode":"ep02-zapier","title":"Zapier — 업무가 끊기는 순간","template":"minimal","fps":30,"duration":23,"brand":{"name":"Zapier","accent":"#FF4A00"},"open":{"text":"업무가 끊기는 순간.","background":{"color":"#0b0b0d","dim":0}},"before":{"words":["받고","옮기고","붙이고","알리고","다시"],"background":{"src":"assets/stock/pexels-7429487-cottonbro.mp4","start":13,"dim":0.42,"blur":1,"saturation":0.55}},"turn":{"lines":["업무가 끊기는 곳은, 앱과 앱 사이.","그 사이를, 사람이 메우고 있었습니다."]},"proof":{"image":"file:///home/user/OpenSafe-Factory/shortform/assets/official/proof-trigger-action-action.png","steps":["Trigger","Action","Action"]},"after":{"words":["받고","잇고","닿고","다음"],"background":{"color":"#0d1116","dim":0}},"close":{"lines":["어느 순간에도,","업무는 이어져야 하니까."],"background":{"src":"assets/stock/pexels-6632967-cup-of-couple.mp4","start":2.6,"dim":0.28,"blur":1,"saturation":0.6}},"end":{"wordmark":"Zapier","logo":"file:///home/user/OpenSafe-Factory/shortform/assets/official/zapier-logo-frost.svg"},"timeline":{"open":0,"before":1.8,"turn":5.8,"proof":8.6,"after":12,"close":16.4,"end":20.6,"total":23}};window.BG={"before":{"count":126,"fps":30,"dim":0.42,"base":"bg_before/"},"close":{"count":12,"fps":30,"dim":0.28,"base":"bg_close/"}};window.AUDIO_SRC='music.wav';</script>
 <script>
 /* =====================================================================
    ZAPIER 편 전용 최소 엔진. engine/template.html(EP01)과 코드 공유 없음 — 독립 파일.
@@ -63,6 +63,27 @@ function sceneBg(parent, cfg, fallback){
     const img = mk('img','bgimg', parent); img.src = cfg.image;
   }
   const dim = mk('div','dim', parent); dim.style.opacity = (cfg && cfg.dim != null) ? cfg.dim : 0;
+}
+
+/* ---------- footage 배경: render.js가 미리 뽑아둔 JPEG 시퀀스(window.BG[key])를 그대로 재생.
+   EP01의 bgLayer()와 같은 방식이며(JPEG를 canvas에 순서대로 그림), 파라랙스 등은 없이 재생만 한다.
+   레이어를 지우지 않고 한 번만 만들어 유지 — 매 프레임 DOM을 다시 만들지 않는다. ---------- */
+const bgImgsAll = [];
+function bgFootage(parent, key, fallbackColor){
+  const B = window.BG && window.BG[key];
+  const fill = mk('div','bgfill', parent); fill.style.background = fallbackColor || '#000';
+  if (!B || !B.count) return { imgs: [], draw(){} };
+  const imgs = [];
+  for (let i = 0; i < B.count; i++){ const im = new Image(); im.src = B.base + String(i+1).padStart(3,'0') + '.jpg'; imgs.push(im); bgImgsAll.push(im); }
+  const cv = mk('canvas', null, parent); cv.width = W; cv.height = H;
+  Object.assign(cv.style, { position:'absolute', inset:0, width:'100%', height:'100%' });
+  const ctx = cv.getContext('2d');
+  const dim = mk('div','dim', parent); dim.style.opacity = B.dim != null ? B.dim : 0.4;
+  return { imgs, draw(tl){
+    const im = imgs[clamp(Math.floor(tl * (B.fps || 30)), 0, imgs.length - 1)];
+    if (!im || !im.complete || !im.naturalWidth) return;
+    ctx.drawImage(im, 0, 0, W, H);
+  } };
 }
 
 /* ---------- 중앙 카피: OPEN / TURN / CLOSE 공용 ---------- */
@@ -131,9 +152,24 @@ function renderEnd(parent, t){
   el.style.opacity = P(t, T.end, T.end + 0.4);
 }
 
-/* ---------- 장면 레이어 ---------- */
+/* ---------- 장면 레이어. footage가 있는 장면(BEFORE/AFTER/CLOSE)은 배경을 한 번만 만들고
+   유지한다 — 매 프레임 지우고 다시 그리는 건 텍스트뿐 (fg 컨테이너). ---------- */
 const Lopen = layer(), Lbefore = layer(), Lturn = layer(), Lproof = layer(),
       Lafter = layer(), Lclose = layer(), Lend = layer();
+
+const bgBefore = bgFootage(Lbefore, 'before', '#101012');
+const bgAfter = bgFootage(Lafter, 'after', '#0d1116');
+const bgClose = bgFootage(Lclose, 'close', '#0b0b0d');
+const FgBefore = mk('div', null, Lbefore);
+const FgAfter = mk('div', null, Lafter);
+const FgClose = mk('div', null, Lclose);
+// TURN: BEFORE footage의 마지막 프레임을 그대로 얼려 쓴다 (Freeze Frame). footage가 없으면 색 배경 fallback.
+const turnCv = mk('canvas', null, Lturn); turnCv.width = W; turnCv.height = H;
+Object.assign(turnCv.style, { position:'absolute', inset:0, width:'100%', height:'100%' });
+const turnCtx = turnCv.getContext('2d');
+mk('div','bgfill', Lturn).style.background = '#101012';
+const FgTurn = mk('div', null, Lturn);
+Lturn.style.filter = 'grayscale(1) brightness(.72)';
 
 function renderOpen(t){
   Lopen.innerHTML = '';
@@ -141,19 +177,19 @@ function renderOpen(t){
   centerLines(Lopen, [(C.open && C.open.text) || ''], t, T.open, T.before, 78);
 }
 function renderBefore(t){
-  Lbefore.innerHTML = '';
-  sceneBg(Lbefore, C.before && C.before.background, '#101012');
-  wordRhythm(Lbefore, (C.before && C.before.words) || [], t, T.before, T.turn);
+  bgBefore.draw(t - T.before);
+  FgBefore.innerHTML = '';
+  wordRhythm(FgBefore, (C.before && C.before.words) || [], t, T.before, T.turn);
 }
 function renderTurn(t){
-  Lturn.innerHTML = '';
-  // Freeze Frame: BEFORE 배경을 그대로 얼리고(정지) 흑백 처리, Silence Drop 은 사운드 단계에서 처리.
-  sceneBg(Lturn, C.before && C.before.background, '#101012');
-  Lturn.style.filter = 'grayscale(1) brightness(.72)';
+  // Freeze Frame: BEFORE의 마지막 프레임 한 장만 그리고 이후엔 다시 그리지 않는다 (정지 유지) + Silence Drop은 사운드 단계
+  const last = bgBefore.imgs[bgBefore.imgs.length - 1];
+  if (last && last.complete && last.naturalWidth) turnCtx.drawImage(last, 0, 0, W, H);
+  FgTurn.innerHTML = '';
   const lines = (C.turn && C.turn.lines) || [];
   const half = (T.proof - T.turn) / 2;
-  if (lines[0]) centerLines(Lturn, [lines[0]], t, T.turn, T.turn + half, 62);
-  if (lines[1]) centerLines(Lturn, [lines[1]], t, T.turn + half, T.proof, 62);
+  if (lines[0]) centerLines(FgTurn, [lines[0]], t, T.turn, T.turn + half, 62);
+  if (lines[1]) centerLines(FgTurn, [lines[1]], t, T.turn + half, T.proof, 62);
 }
 function renderProofScene(t){
   Lproof.innerHTML = '';
@@ -161,15 +197,15 @@ function renderProofScene(t){
   renderProof(Lproof, t);
 }
 function renderAfter(t){
-  Lafter.innerHTML = '';
-  sceneBg(Lafter, C.after && C.after.background, '#0d1116');
-  wordRhythm(Lafter, (C.after && C.after.words) || [], t, T.after, T.close);
+  bgAfter.draw(t - T.after);
+  FgAfter.innerHTML = '';
+  wordRhythm(FgAfter, (C.after && C.after.words) || [], t, T.after, T.close);
 }
 function renderClose(t){
-  Lclose.innerHTML = '';
-  // CLOSE: OPEN과 같은 구도(같은 배경 소스)로 되돌아가되 손이 빠진 프레임을 쓴다(footage 준비 시 반영).
-  sceneBg(Lclose, C.close && C.close.background || C.open && C.open.background, '#0b0b0d');
-  centerLines(Lclose, (C.close && C.close.lines) || [], t, T.close, T.end, 70);
+  // CLOSE: 같은 구도(OPEN과 같은 촬영)에서 손이 빠진 프레임만 짧게 뽑아 정지시켜 쓴다.
+  bgClose.draw(t - T.close);
+  FgClose.innerHTML = '';
+  centerLines(FgClose, (C.close && C.close.lines) || [], t, T.close, T.end, 70);
 }
 function renderEndScene(t){
   Lend.innerHTML = '';
@@ -190,7 +226,7 @@ function render(t){
 }
 render(0);
 window.CUES = { T };
-window.ASSETS_READY = Promise.resolve();
+window.ASSETS_READY = Promise.all(bgImgsAll.map(im => im.decode().catch(() => {})));
 window.render = render;
 window.DURATION = C.duration || T.total;
 

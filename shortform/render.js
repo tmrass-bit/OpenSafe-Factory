@@ -22,7 +22,11 @@ const argFrames = process.argv.includes('--frames') ? process.argv[process.argv.
   await page.goto('file://' + tpl + '?render=1');
   const T = await page.evaluate(() => window.CUES.T);
   const fps = cfg.fps || 30, BG = {};
-  const spans = { hook: [T.hook, T.stop], before: [T.before, T.turn], cta: [T.cta, T.end] };
+  // minimal template은 장면 이름이 다르므로(open/before/after/close) 별도 span 매핑을 쓴다.
+  // close는 "손이 빠진 정지 프레임"이라 아주 짧게만 추출 → draw()가 마지막 프레임에서 자연히 멈춤(정지 효과)
+  const spans = cfg.template === 'minimal'
+    ? { before: [T.before, T.turn], after: [T.after, T.close], close: [T.close, T.close + 0.2] }
+    : { hook: [T.hook, T.stop], before: [T.before, T.turn], cta: [T.cta, T.end] };
   for (const key of Object.keys(spans)) {
     const bg = cfg[key] && cfg[key].background; if (!bg || !bg.src) continue;
     const dir = path.join(out, 'bg_' + key); fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir);
