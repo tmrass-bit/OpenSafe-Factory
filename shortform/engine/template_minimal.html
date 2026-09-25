@@ -169,58 +169,70 @@ function renderClimax(t){
     ];
     let cur = beats[beats.length - 1];
     for (const beat of beats) { if (t >= beat[0] && t < beat[1]) { cur = beat; break; } }
-    const [a, b, key, photo, grade] = cur; const localT = t - a;
+    const [a, b, key, photo] = cur; const localT = t - a;
     if (!photo) return;
-    const pic = mk('img','photoFill', Lclimax); pic.src = photo.image; pic.style.objectPosition = photo.position || '50% 50%';
-    pic.style.filter = grade === 'bw'
-      ? 'grayscale(0.92) contrast(1.4) brightness(0.72)'      // 흑백 고대비, 깊은 암부 — 참고 이미지(받고/닿고)의 무드
-      : 'contrast(1.18) saturate(0.85) brightness(0.85)';     // 잇고/다음: 색 유지 + wash로 색언어 통일
-    if (grade === 'wash') {
-      const wash = mk('div', null, Lclimax);
-      Object.assign(wash.style, { position:'absolute', inset:0,
-        background:'linear-gradient(160deg, rgba(107,33,168,.4) 0%, rgba(219,39,119,.22) 45%, rgba(255,122,24,.22) 100%)',
-        mixBlendMode:'overlay' });
-    } else {
-      const wash = mk('div', null, Lclimax); // bw 컷도 미세한 purple/orange wash로 시리즈 색언어 통일(아주 약하게)
-      Object.assign(wash.style, { position:'absolute', inset:0,
-        background:'linear-gradient(160deg, rgba(107,33,168,.16) 0%, rgba(0,0,0,0) 50%, rgba(255,122,24,.1) 100%)',
-        mixBlendMode:'overlay' });
-    }
-    const vig = mk('div', null, Lclimax);
-    Object.assign(vig.style, { position:'absolute', inset:0, background:'radial-gradient(ellipse at center, rgba(0,0,0,0) 42%, rgba(0,0,0,.62) 100%)' });
-    const grain = mk('div','grain', Lclimax);
-    const capLayer = mk('div', null, Lclimax); // 사진/wash/vignette/grain보다 나중에 붙여야 타이포가 위로 그려진다
+    /* 레퍼런스(여행앱) 문법: 검정 바탕 + 중앙 16:9 이미지 밴드 + 밴드 한가운데 굵은 단어.
+       밴드 위치·단어 위치는 4컷 동일, 컷마다 색감·글자 크기·색·모션 에너지만 바뀐다. */
+    const BAND_W = 1080, BAND_H = 608, BAND_TOP = 960 - BAND_H / 2;
+    const band = mk('div', null, Lclimax);
+    Object.assign(band.style, { position:'absolute', left:0, top:BAND_TOP+'px', width:BAND_W+'px', height:BAND_H+'px', overflow:'hidden', background:'#000' });
+    const ART = {
+      // crop 위치 / 사진 grade / 색 wash / 단어 스타일
+      badgo: { pos:'50% 26%', filter:'grayscale(1) contrast(1.35) brightness(.85)',
+               wash:'linear-gradient(115deg,#5b1fb5 0%,#c2338f 55%,#ff7a3d 100%)', blend:'color', washOp:.62,
+               size:176, color:'white' },
+      itgo:  { pos:'50% 42%', filter:'contrast(1.1) saturate(1.3) brightness(.78)',
+               wash:'linear-gradient(115deg,#6a22e0 0%,#d4307f 60%,#e8702e 100%)', blend:'multiply', washOp:.7,
+               size:168, color:'white' },
+      dahgo: { pos:'62% 45%', filter:'contrast(1.2) saturate(1.25) brightness(1.08)',
+               wash:'linear-gradient(115deg,#3a1080 0%,#b02a8a 55%,#ff6a2a 100%)', blend:'screen', washOp:.35,
+               size:176, color:'white' },
+      daeum: { pos:'50% 38%', filter:'contrast(1.15) saturate(1.3) brightness(.8)',
+               wash:'linear-gradient(115deg,#4a1a9a 0%,#9a2a6e 55%,#b0552a 100%)', blend:'multiply', washOp:.6,
+               size:220, color:'gradient' },
+    }[key];
+    const pic = mk('img', null, band); pic.src = photo.image;
+    const settle = eCubic(P(localT, 0, 0.35));
+    Object.assign(pic.style, { position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover',
+      objectPosition: ART.pos, filter: ART.filter, transform:`scale(${lerp(1.06, 1, settle)})` });
+    const wash = mk('div', null, band);
+    Object.assign(wash.style, { position:'absolute', inset:0, background:ART.wash, mixBlendMode:ART.blend, opacity:ART.washOp });
+    const vig = mk('div', null, band);
+    Object.assign(vig.style, { position:'absolute', inset:0, background:'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,.45) 100%)' });
+    const capLayer = mk('div', null, Lclimax); // 밴드보다 나중에 붙여야 위로 그려진다
 
     const wEl = mk('div','word', capLayer, esc(photo.word));
-    wEl.style.fontSize = (key === 'daeum' ? 168 : 140) + 'px'; // 다음은 앞 3컷보다 약간 크게
-    // 4컷은 하나의 리듬 시퀀스 — POSITION은 고정(화면 중앙, 같은 기준선), 크기·색·모션만 변주
+    wEl.style.fontSize = ART.size + 'px';
+    wEl.style.fontWeight = '900';
+    wEl.style.letterSpacing = '-0.04em';
     wEl.style.left = '540px';
-    wEl.style.top = '960px';
-    const gradientText = (moving) => {
-      wEl.style.background = 'linear-gradient(90deg,#B026FF 0%,#FF3D9A 45%,#FF7A18 100%)';
+    wEl.style.top = '960px'; // 4컷 고정 위치
+    wEl.style.filter = 'drop-shadow(0 6px 22px rgba(0,0,0,.4))'; // 그라디언트 글자에도 적용되는 부드러운 분리감
+    if (ART.color === 'gradient') {
+      wEl.style.background = 'linear-gradient(90deg,#b565ff 0%,#ff5fae 50%,#ffb070 100%)';
       wEl.style.webkitBackgroundClip = 'text'; wEl.style.backgroundClip = 'text'; wEl.style.color = 'transparent';
-      if (moving != null) { wEl.style.backgroundSize = '220% 100%'; wEl.style.backgroundPosition = lerp(110, -20, moving) + '% 0'; }
-      else { wEl.style.backgroundSize = '100% 100%'; }
-    };
-    if (key === 'badgo') { // 받고: translateY 30px→0 + opacity, 0.25s 안에 끝내고 hold
-      const p = eCubic(P(localT, 0, 0.25));
-      wEl.style.color = '#fff';
-      wEl.style.opacity = p; wEl.style.transform = `translate(-50%,-50%) translateY(${lerp(30, 0, p)}px)`;
-    } else if (key === 'itgo') { // 잇고: gradient-position 좌→우 + translateX 소폭("연결" 방향성)
-      const p = eCubic(P(localT, 0, 0.25));
-      wEl.style.opacity = p; gradientText(P(localT, 0, b - a));
-      wEl.style.transform = `translate(-50%,-50%) translateX(${lerp(-24, 0, p)}px)`;
-    } else if (key === 'dahgo') { // 닿고: 텍스트가 대상 쪽으로 이동 후 snap, scale은 아주 작게
-      const p = eBack(P(localT, 0, 0.28));
-      wEl.style.color = '#fff';
-      wEl.style.opacity = P(localT, 0, 0.15);
-      wEl.style.transform = `translate(-50%,-50%) translateX(${lerp(-60, 0, p)}px) scale(${lerp(0.96, 1, p)})`;
-    } else { // 다음: translateX + scale .95→1.05→1.0(오버슈트 후 정착), 앞 3컷보다 약간 크게
-      const p1 = P(localT, 0, 0.15), p2 = P(localT, 0.15, 0.3);
-      const s = p2 > 0 ? lerp(1.05, 1.0, eCubic(p2)) : lerp(0.95, 1.05, eCubic(p1));
-      gradientText(null);
-      wEl.style.opacity = Math.max(p1, 0.001);
-      wEl.style.transform = `translate(-50%,-50%) translateX(${lerp(24, 0, eCubic(p1))}px) scale(${s})`;
+      wEl.style.backgroundSize = '200% 100%';
+    } else { wEl.style.color = '#fff'; }
+    if (key === 'badgo') { // 받고: 크게 찍히듯 등장(punch-in)
+      const p = eCubic(P(localT, 0, 0.18));
+      wEl.style.opacity = P(localT, 0, 0.08);
+      wEl.style.transform = `translate(-50%,-50%) scale(${lerp(1.25, 1, p)})`;
+    } else if (key === 'itgo') { // 잇고: 그라디언트가 좌→우로 흐르며 아래에서 올라옴
+      const p = eCubic(P(localT, 0, 0.22));
+      wEl.style.opacity = p;
+      wEl.style.backgroundPosition = lerp(100, 0, eCubic(P(localT, 0, 0.6))) + '% 0';
+      wEl.style.transform = `translate(-50%,-50%) translateY(${lerp(40, 0, p)}px)`;
+    } else if (key === 'dahgo') { // 닿고: 넓은 자간에서 한 점으로 모이며 snap
+      const p = eBack(P(localT, 0, 0.26));
+      wEl.style.opacity = P(localT, 0, 0.1);
+      wEl.style.letterSpacing = lerp(0.35, -0.04, clamp(p, 0, 1.2)) + 'em';
+      wEl.style.transform = `translate(-50%,-50%)`;
+    } else { // 다음: 가장 크게, 앞으로 밀어내듯 scale 오버슈트
+      const p1 = P(localT, 0, 0.14), p2 = P(localT, 0.14, 0.3);
+      const s = p2 > 0 ? lerp(1.06, 1.0, eCubic(p2)) : lerp(0.82, 1.06, eCubic(p1));
+      wEl.style.opacity = Math.max(p1 * 1.6, 0.001);
+      wEl.style.backgroundPosition = lerp(60, 0, eCubic(P(localT, 0, 0.5))) + '% 0';
+      wEl.style.transform = `translate(-50%,-50%) scale(${s})`;
     }
     return;
   }
