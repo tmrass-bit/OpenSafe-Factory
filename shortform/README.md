@@ -35,6 +35,10 @@ shortform/
    | `brand.name`, `brand.logo` | 브랜드명 · 로고 이미지 경로(없으면 LOGO 자리 표시) |
 3. `bash make.sh episodes/ep02-quote`
 
+## 검수 (렌더 전에 싼 것부터)
+`node validate.js scenes | still <장면|초> | storyboard | section <장면> | animatic` — 결과는 `out/<episode>/validate/` (git 제외).
+최종 1080x1920 은 승인 후 `node validate.js final --approved` (= `bash make.sh`).
+
 ## 미리보기
 `out/<episode>/preview.html` 을 브라우저로 열면 바로 재생됩니다 (클릭하면 처음부터 + 음악).
 

@@ -2,3 +2,5 @@ node_modules/
 out/*/video_noaudio.mp4
 out/*/still_*.png
 out/*/bg_*/
+# 검수용 중간 결과물 (storyboard · section · animatic · still) — node validate.js
+out/*/validate/
