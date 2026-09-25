@@ -15,9 +15,9 @@ const argFrames = process.argv.includes('--frames') ? process.argv[process.argv.
   await page.goto('file://' + tpl + '?render=1');
   const T = await page.evaluate(() => window.CUES.T);
   const fps = cfg.fps || 30, BG = {};
-  const spans = { hook: [T.hook, T.stop], before: [T.before, T.turn], cta: [T.cta, T.end] };
+  const spans = { hook: [T.hook, T.stop], before: [T.before, T.turn], cta: [T.cta, T.end], 'compare.before': [T.compare, T.cmpAfter], 'compare.after': [T.cmpAfter, T.core] };
   for (const key of Object.keys(spans)) {
-    const bg = cfg[key] && cfg[key].background; if (!bg || !bg.src) continue;
+    const bg = (key.split('.').reduce((o, k) => o && o[k], cfg) || {}).background; if (!bg || !bg.src) continue;
     const dir = path.join(out, 'bg_' + key); fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir);
     const len = spans[key][1] - spans[key][0] + 0.2;
     // 배경은 얕은 심도로 흐리게 쓰므로 절반 해상도로 추출해 용량을 줄임

@@ -657,58 +657,63 @@ function renderDash(t){
 }
 
 /* =====================================================================
-   7) BEFORE / AFTER 비교
+   7) BEFORE / AFTER 비교 — EXTERNALIZE
+   같은 사람 · 같은 구도(매치 컷). 사람에게 붙어 있던 업무 조각 3개가
+   하드 컷과 함께 벽의 업무 보드로 옮겨가고, 보드 위에서 담당 · 단계 · 상태가 드러난다.
    ===================================================================== */
 const Lcmp = layer();
-const pTop = mk('div','panel',Lcmp); pTop.style.top='0'; pTop.style.background='linear-gradient(180deg,#1a0708,#0a0303)';
-const pBot = mk('div','panel',Lcmp); pBot.style.top='960px'; pBot.style.background='linear-gradient(180deg,#040b18,#071a33)';
-// 같은 프레임 · 같은 구도 → 무질서(BEFORE) vs 질서(AFTER)
-const FR = {x:100, y:300, w:880, h:600}, COLX = [FR.w/6, FR.w/2, FR.w*5/6];
-function cframe(parent, cls){ const f=mk('div','cframe '+cls,parent); Object.assign(f.style,{left:FR.x+'px',top:FR.y+'px',width:FR.w+'px',height:FR.h+'px'}); return f; }
-const fTop = cframe(pTop,'messy');
-mk('div','cstrip',fTop,[['처리 대기',C.before.counterTo],['미분류',19],['확인 필요',11]].map(([l,v],i)=>
-  `<div class="cst" style="background:${i==2?'#2a1d08':'#2a0f10'};color:${i==2?'#F5A524':'#FF5A5F'};border:2px solid ${i==2?'#F5A524':'#FF5A5F'}">${l}<b>${v}</b></div>`).join(''));
-const MWT = [WB.chat.title, WB.mail.title, WB.sheet.title, WB.memo.title].concat(C.hook.notifications.slice(1,4).map(n=>n.title));
-const MW = [[40,120,290,190,-5],[300,105,300,200,4],[560,135,290,180,-3],[120,265,300,190,6],[420,250,290,200,-6],[610,300,250,170,3],[240,360,280,160,-2]].map(([x,y,w,h,r],i)=>{
-  const e=mk('div','mw',fTop,`<div class="mt">${DOTS.replace(/<i /g,'<i ')}<span>${esc(MWT[i%MWT.length])}</span></div><div class="sk" style="width:70%"></div><div class="sk" style="width:52%"></div><div class="sk" style="width:62%"></div>`);
-  Object.assign(e.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px',zIndex:i,filter:i<3?'blur(2px) brightness(.7)':''});
-  const b=mk('div','bdg',e,String([23,38,9,7,5,12,3][i])); Object.assign(b.style,{right:'10px',top:'40px',height:'34px',minWidth:'34px',fontSize:'20px'});
-  return {e, r, sh:i%3===1};
+const cmpBgB = bgLayer(Lcmp, 'compare.before'), cmpBgA = bgLayer(Lcmp, 'compare.after');
+const cmpTint = mk('div','abs',Lcmp); Object.assign(cmpTint.style,{inset:0});
+const cmpFoot = mk('div','abs',Lcmp); Object.assign(cmpFoot.style,{left:0,right:0,bottom:0,height:'720px',background:'linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.82) 55%)'});
+// 외부 업무 보드 (벽면 화이트보드) — 3-lane 흐름도와 다른 밝은 실물 보드
+const BD = {x:596, y:150, w:452, h:520}, ROW = 150;
+const board = mk('div','abs',Lcmp); Object.assign(board.style,{left:BD.x+'px',top:BD.y+'px',width:BD.w+'px',height:BD.h+'px',borderRadius:'18px',
+  background:'rgba(246,247,249,.96)',border:'3px solid #d4d8df',boxShadow:'0 24px 60px rgba(0,0,0,.45)'});
+mk('div','abs',board,C.after.lanes.map(l=>`<i style="flex:1;background:${l.color}"></i>`).join('')).style.cssText='left:18px;right:18px;top:18px;height:10px;border-radius:5px;overflow:hidden;display:flex';
+for(let i=1;i<3;i++){ const ln=mk('div','abs',board); Object.assign(ln.style,{left:'18px',right:'18px',top:(46+i*ROW)+'px',height:'2px',background:'#e1e4ea'}); }
+// 업무 조각: 포스트잇 · 메신저 알림 · 메모지 (내용 = result.reviews)
+const REV = C.result.reviews.slice(0,3);
+const lines = s => esc(s).split(' · ').join('<br>');
+const FRAG = [
+  { w:250, h:200, html:r=>`<div style="padding:26px 24px;font-size:33px;font-weight:800;line-height:1.3;color:#3b2f00">${lines(r.text)}</div>`,
+    css:'background:#FFE066;border-radius:4px;box-shadow:0 14px 30px rgba(0,0,0,.45)', from:[330,480,-9], to:0.62 },
+  { w:400, h:124, html:r=>`<div style="display:flex;gap:16px;align-items:center;padding:18px 20px"><div class="ic ic-kakao" style="width:72px;height:72px;border-radius:18px;font-size:22px;flex:none">TALK</div><div style="min-width:0"><div style="font-size:21px;color:#6b6b70">${esc(C.hook.notifications[0].name)} · 지금</div><div style="font-size:31px;font-weight:800;color:#111;white-space:nowrap">${esc(r.text)}</div></div></div>`,
+    css:'background:rgba(255,255,255,.97);border-radius:26px;box-shadow:0 14px 30px rgba(0,0,0,.45)', from:[700,640,6], to:0.5 },
+  { w:260, h:190, html:r=>`<i style="position:absolute;left:85px;top:-14px;width:90px;height:30px;background:rgba(220,220,200,.8);transform:rotate(-4deg)"></i><div style="padding:30px 24px;font-size:31px;font-weight:700;line-height:1.35;color:#2b2b2b">${lines(r.text)}</div>`,
+    css:'background:#f6f3ea;border-radius:3px;box-shadow:0 14px 30px rgba(0,0,0,.45)', from:[290,930,5], to:0.62 },
+].map((f,i)=>{ const r=REV[i], e=mk('div','abs',Lcmp,f.html(r)); e.style.cssText+=`;left:0;top:0;width:${f.w}px;height:${f.h}px;${f.css};transform-origin:50% 50%`;
+  const tx=BD.x+26+f.w*f.to/2, ty=BD.y+46+ROW*i+ROW/2;
+  const col=LANE_COLOR[r.lane]||'#888', step={'대기':1,'검토중':2,'전달됨':3}[r.status]||2;
+  const meta=mk('div','abs',board,`<div style="display:flex;align-items:center;gap:12px"><div style="width:54px;height:54px;border-radius:50%;background:${col};color:#000;font-size:27px;font-weight:900;display:flex;align-items:center;justify-content:center">${esc(r.who)}</div>`+
+    `<div style="font-size:24px;font-weight:900;color:${col};border:2px solid ${col};border-radius:20px;padding:4px 14px;white-space:nowrap;background:#fff">${esc(r.status)}</div></div>`+
+    `<div style="display:flex;gap:8px;margin-top:12px;margin-left:66px">${[0,1,2].map(k=>`<i style="width:26px;height:8px;border-radius:4px;background:${k<step?col:'#d4d8df'}"></i>`).join('')}</div>`);
+  Object.assign(meta.style,{left:(BD.w-196)+'px',top:(46+ROW*i+ROW/2-42)+'px'});
+  return {e, f, tx, ty, meta};
 });
-const mCur = mk('div','abs',fTop,`<svg width="44" height="44" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15.5 L12.5 22 L15.5 20.6 L12.2 14.2 L19 14.2 Z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg>`); mCur.style.zIndex=20;
-const MCP = [[420,380],[180,220],[640,250],[330,430],[700,420],[250,300]];   // 커서가 헤매는 지점
-mk('div','cbar',fTop,`<span style="color:#FF5A5F">미분류 ${19}</span><div class="tr"><div style="width:18%;background:#555"></div><div style="width:9%;background:#777"></div><div style="flex:1;background:#FF5A5F55"></div></div><span style="color:#888">담당 ?</span>`).style.background='#1d0e10';
-
-const fBot = cframe(pBot,'clean');
-const K = C.result.kpis;
-mk('div','cstrip',fBot,[['미처리',C.result.pendingValue,'#34C759','#0c1f12']].concat(K.slice(0,2).map(k=>[k.label,k.value,LANE_COLOR[k.lane],'#0e1a30'])).map(([l,v,c,bg])=>
-  `<div class="cst" style="background:${bg};color:${c};border:2px solid ${c}">${esc(l)}<b>${v}</b></div>`).join(''));
-C.after.lanes.forEach((l,i)=>{ const h=mk('div','lhd',fBot,esc(l.label)); Object.assign(h.style,{left:(COLX[i]-125)+'px',width:'250px',background:l.color+'33',border:`2px solid ${l.color}`}); });
-const CC = []; C.after.lanes.forEach((l,i)=>{ for(let k=0;k<4;k++){ const e=mk('div','ccard',fBot,'<i></i><i></i>'); Object.assign(e.style,{left:(COLX[i]-125)+'px',width:'250px',borderColor:l.color}); CC.push({e,col:i,k}); } });
-const cbarB = mk('div','cbar',fBot,`<span style="color:#34C759">✓ 전부 분류됨</span><div class="tr">${K.map(k=>`<div style="flex:${k.value};background:${LANE_COLOR[k.lane]}"></div>`).join('')}</div><span style="color:#9fb4d8">${K.reduce((a,k)=>a+k.value,0)}건</span>`); cbarB.style.background='#0e1a30';
-const topTxt = mk('div','abs',pTop,`<div class="tag" style="background:#FF5A5F;color:#000">${esc(C.compare.before.tag)}</div>`); Object.assign(topTxt.style,{left:'0',right:'0',top:'70px',textAlign:'center'});
-const topBig = bigText(pTop, esc(C.compare.before.text), 210, 96);
-const botTxt = mk('div','abs',pBot,`<div class="tag" style="background:#4F8CFF;color:#000">${esc(C.compare.after.tag)}</div>`); Object.assign(botTxt.style,{left:'0',right:'0',top:'60px',textAlign:'center'});
-const botBig = bigText(pBot, esc(C.compare.after.text), 200, 96);
-const arrow = mk('div','abs',Lcmp,'<svg width="130" height="130" viewBox="0 0 130 130"><circle cx="65" cy="65" r="62" fill="#fff"/><path d="M65 35 L65 92 M42 70 L65 93 L88 70" stroke="#000" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
-Object.assign(arrow.style,{left:'475px',top:'895px'});
+const cmpLbl = [C.compare.before, C.compare.after].map((c,i)=>{
+  const g=mk('div','abs',Lcmp); Object.assign(g.style,{left:0,top:0,width:W+'px',height:H+'px'});
+  const tg=mk('div','abs',g,`<div class="tag" style="background:${i?'#4F8CFF':'#FF5A5F'};color:#000">${esc(c.tag)}</div>`); Object.assign(tg.style,{left:'0',right:'0',top:'1490px',textAlign:'center'});
+  setTx(bigText(g, esc(c.text), 1640, 96),{o:1}); return g; });
 CUES.hits.push({t:T.cmpAfter,k:'resolve'});
 function renderCmp(t){
-  const a=T.compare;
-  // 하드 컷으로 BEFORE → 다음 박자에 같은 프레임·같은 구도의 AFTER 가 하드 컷으로 들어옴 (매치 컷 · 스플릿 스크린)
-  const on2 = t>=T.cmpAfter;
-  pTop.style.transform=''; pBot.style.transform=''; pBot.style.opacity = on2?1:0;
-  pTop.style.filter = on2 ? `brightness(${lerp(1,0.8,P(t,T.cmpAfter,T.cmpAfter+0.5*T.beat))})` : '';
-  arrow.style.transform=''; arrow.style.opacity = on2?1:0;
-  setTx(topBig,{o:1}); setTx(botBig,{o:1});
-  // BEFORE: 흔들리는 겹친 창 + 헤매는 커서
-  MW.forEach((m,i)=>{ const j=m.sh? Math.sin(t*38+i)*3 : 0; m.e.style.transform=`rotate(${m.r}deg) translate(${j}px,${m.sh?Math.cos(t*33+i)*2:0}px)`; });
-  const cu=((t-a)/(0.5*T.beat)), ci=Math.floor(cu), cf=cu-ci, A=MCP[ci%MCP.length], B=MCP[(ci+1)%MCP.length], cp=eExpo(clamp(cf/0.35));
-  mCur.style.left=lerp(A[0],B[0],cp)+'px'; mCur.style.top=lerp(A[1],B[1],cp)+'px';
-  // AFTER: 규칙적으로 흘러 내려가는 카드 (열마다 같은 박자)
-  const ph=(t-a)/T.beat, stp=Math.floor(ph)+eExpo(clamp((ph%1)/0.4));   // 박자마다 한 칸씩 '착' 전진
-  CC.forEach(c=>{ const u=((stp + c.k)/4)%1; const y=150+u*300;
-    c.e.style.top=y+'px'; c.e.style.opacity=clamp(Math.min(u/0.12,(1-u)/0.12)); });
+  const a=T.compare, on2=t>=T.cmpAfter, B=T.beat;
+  // 배경: 하드 컷 매치 컷 (같은 카메라 · 같은 배율)
+  [cmpBgB.cv,cmpBgB.shade].forEach(e=>e&&(e.style.display=on2?'none':'block'));
+  [cmpBgA.cv,cmpBgA.shade].forEach(e=>e&&(e.style.display=on2?'block':'none'));
+  if(on2) cmpBgA.draw(t-T.cmpAfter, 1.03); else cmpBgB.draw(t-a, 1.03+0.015*P(t,a,T.cmpAfter));
+  cmpTint.style.background = on2 ? 'rgba(20,70,160,.12)' : 'rgba(120,10,15,.16)';
+  cmpLbl[0].style.opacity = on2?0:1; cmpLbl[1].style.opacity = on2?1:0;
+  board.style.opacity = on2?1:0;
+  // BEFORE: 조각이 8분의 1박 간격으로 사람에게 달라붙음 → AFTER: 컷과 함께 보드 자리로 스냅
+  const mv = eExpo(P(t, T.cmpAfter, T.cmpAfter+0.2));
+  FRAG.forEach((g,i)=>{
+    const [fx,fy,fr]=g.f.from, pin=eExpo(P(t, a+i*B/8, a+i*B/8+0.12));
+    const x=lerp(fx,g.tx,mv), y=lerp(fy,g.ty,mv), r=lerp(fr,0,mv), s=lerp(lerp(1.15,1,pin),g.f.to,mv);
+    g.e.style.opacity=on2?1:pin; g.e.style.zIndex=on2?5:3;
+    g.e.style.transform=`translate(${x-g.f.w/2}px,${y-g.f.h/2}px) rotate(${r}deg) scale(${s})`;
+    const mp=eExpo(P(t, T.cmpAfter+0.2+i*B/4, T.cmpAfter+0.2+i*B/4+0.15));
+    g.meta.style.opacity=on2?mp:0; g.meta.style.transform=`translateX(${lerp(16,0,mp)}px)`;
+  });
 }
 
 /* =====================================================================

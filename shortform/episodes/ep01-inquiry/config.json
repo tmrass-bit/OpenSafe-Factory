@@ -107,8 +107,10 @@
   },
 
   "compare": {
-    "before": { "tag": "BEFORE", "text": "사람 머릿속 업무" },
-    "after": { "tag": "AFTER", "text": "누구나 따라가는 시스템" }
+    "before": { "tag": "BEFORE", "text": "사람 머릿속 업무",
+      "background": { "src": "assets/stock/pexels-6623022-keira-burton.mp4", "start": 3.5, "dim": 0.35, "blur": 1, "saturation": 0.55 } },
+    "after": { "tag": "AFTER", "text": "누구나 따라가는 시스템",
+      "background": { "src": "assets/stock/pexels-6623022-keira-burton.mp4", "start": 8.8, "dim": 0.25, "blur": 1, "saturation": 0.75 } }
   },
 
   "core": {

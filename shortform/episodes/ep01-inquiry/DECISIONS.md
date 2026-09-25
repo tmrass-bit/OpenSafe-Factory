@@ -38,7 +38,7 @@ STATUS: **FINAL APPROVED 아님 · Golden 미선언** — 아래 LOCKED 항목�
 - Sub impact 2회 이상 — CLIMAX 1회만
 
 # OPEN
-- **REVIEW · compare 장면 (약 17~18.5초, `SPLIT_COMPARE`)** — "사람 머릿속 업무" → "누구나 따라가는 시스템". 미승인, 수정 필요.
+- **REVIEW · compare 장면 (약 17~18.5초, `SPLIT_COMPARE`)** — "사람 머릿속 업무" → "누구나 따라가는 시스템". A안 EXTERNALIZE 구현 (실사 매치 컷 + 업무 조각 → 벽면 보드), section 승인 대기.
   문제: 추상적 개념을 UI/텍스트로 다시 설명하고 있어 사람 의존 → 시스템 외부화의 변화가 직관적으로 보이지 않음.
 - message hierarchy 역할 라벨 확인 (repo 구조에서 도출한 제안): HOOK=hook · PROBLEM=stop/before/overload · TURN=turn · CLIMAX=`turnText` 구조 완성 · PROOF=after/result/compare · BRAND_MESSAGE=core · CTA=cta
 - `brand.name` = "브랜드명" placeholder · `brand.logo` = null

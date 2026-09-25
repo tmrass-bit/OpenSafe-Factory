@@ -61,9 +61,9 @@ async function openPage(viewport) {
 
 // 실사 배경 프레임 (render.js 와 같은 필터 · 같은 540x960). 설정이 같으면 재사용.
 async function withBackgrounds(page, T) {
-  const spans = { hook: [T.hook, T.stop], before: [T.before, T.turn], cta: [T.cta, T.end] }, BG = {};
+  const spans = { hook: [T.hook, T.stop], before: [T.before, T.turn], cta: [T.cta, T.end], 'compare.before': [T.compare, T.cmpAfter], 'compare.after': [T.cmpAfter, T.core] }, BG = {};
   for (const key of Object.keys(spans)) {
-    const bg = cfg[key] && cfg[key].background; if (!bg || !bg.src) continue;
+    const bg = (key.split('.').reduce((o, k) => o && o[k], cfg) || {}).background; if (!bg || !bg.src) continue;
     const dir = path.join(work, 'bg_' + key), len = spans[key][1] - spans[key][0] + 0.2;
     const vf = [`fps=${fps}`, 'scale=540:960:force_original_aspect_ratio=increase', 'crop=540:960',
       `eq=saturation=${bg.saturation ?? 0.6}`, bg.blur ? `gblur=sigma=${bg.blur / 2}` : null].filter(Boolean).join(',');
