@@ -181,12 +181,13 @@ function renderClimax(t){
       // crop 위치 / 사진 grade / 색 wash / 단어 스타일
       badgo: { pos:'50% 26%', filter:'grayscale(1) contrast(1.35) brightness(.85)',
                wash:'linear-gradient(115deg,#5b1fb5 0%,#c2338f 55%,#ff7a3d 100%)', blend:'color', washOp:.62,
-               size:176, color:'white' },
-      itgo:  { pos:'50% 42%', filter:'contrast(1.1) saturate(1.3) brightness(.78)',
+               size:200, color:'white' },
+      itgo:  { pos:'50% 42%', filter:'blur(6px) contrast(.9) saturate(1.05) brightness(.56)', // 카드 아이콘 정보량을 눌러 타이포 우선
                wash:'linear-gradient(115deg,#6a22e0 0%,#d4307f 60%,#e8702e 100%)', blend:'multiply', washOp:.7,
                size:168, color:'white' },
-      dahgo: { pos:'62% 45%', filter:'contrast(1.2) saturate(1.25) brightness(1.08)',
-               wash:'linear-gradient(115deg,#3a1080 0%,#b02a8a 55%,#ff6a2a 100%)', blend:'screen', washOp:.35,
+      dahgo: { pos:'62% 45%', filter:'contrast(1.45) saturate(1.2) brightness(.9)',
+               zoom:1.9, origin:'53% 40%', // 손가락-화면 접촉 지점 강한 crop
+               wash:'linear-gradient(115deg,#5b1fb5 0%,#c2338f 55%,#ff7a3d 100%)', blend:'soft-light', washOp:.85,
                size:176, color:'white' },
       daeum: { pos:'50% 38%', filter:'contrast(1.15) saturate(1.3) brightness(.8)',
                wash:'linear-gradient(115deg,#4a1a9a 0%,#9a2a6e 55%,#b0552a 100%)', blend:'multiply', washOp:.6,
@@ -195,7 +196,8 @@ function renderClimax(t){
     const pic = mk('img', null, band); pic.src = photo.image;
     const settle = eCubic(P(localT, 0, 0.35));
     Object.assign(pic.style, { position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover',
-      objectPosition: ART.pos, filter: ART.filter, transform:`scale(${lerp(1.06, 1, settle)})` });
+      objectPosition: ART.pos, filter: ART.filter, transformOrigin: ART.origin || '50% 50%',
+      transform:`scale(${(ART.zoom || 1) * lerp(1.06, 1, settle)})` });
     const wash = mk('div', null, band);
     Object.assign(wash.style, { position:'absolute', inset:0, background:ART.wash, mixBlendMode:ART.blend, opacity:ART.washOp });
     const vig = mk('div', null, band);
@@ -215,9 +217,9 @@ function renderClimax(t){
       wEl.style.backgroundSize = '200% 100%';
     } else { wEl.style.color = '#fff'; }
     if (key === 'badgo') { // 받고: 크게 찍히듯 등장(punch-in)
-      const p = eCubic(P(localT, 0, 0.18));
-      wEl.style.opacity = P(localT, 0, 0.08);
-      wEl.style.transform = `translate(-50%,-50%) scale(${lerp(1.25, 1, p)})`;
+      const p = eCubic(P(localT, 0, 0.12));
+      wEl.style.opacity = P(localT, 0, 0.05);
+      wEl.style.transform = `translate(-50%,-50%) scale(${lerp(1.32, 1, p)})`;
     } else if (key === 'itgo') { // 잇고: 그라디언트가 좌→우로 흐르며 아래에서 올라옴
       const p = eCubic(P(localT, 0, 0.22));
       wEl.style.opacity = p;
