@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Shortform Engine</title>
+<style>
+  :root { --ai:#4F8CFF; --human:#F5A524; --exc:#FF5A5F; --ok:#34C759; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { background:#000; overflow:hidden; }
+  body { font-family:'Noto Sans CJK KR','Noto Sans KR',sans-serif; color:#fff; -webkit-font-smoothing:antialiased; }
+  #stage { position:relative; width:1080px; height:1920px; overflow:hidden; background:#000; transform-origin:0 0; }
+  .layer { position:absolute; inset:0; display:none; }
+  .abs { position:absolute; }
+  .txt { position:absolute; left:540px; white-space:nowrap; font-weight:900; letter-spacing:-0.035em; line-height:1.12; text-align:center; will-change:transform,opacity; }
+
+  /* ---------- notifications ---------- */
+  .noti { position:absolute; width:820px; height:150px; border-radius:34px; background:rgba(242,242,247,.96);
+          display:flex; align-items:center; gap:26px; padding:0 30px; color:#111; box-shadow:0 20px 60px rgba(0,0,0,.55); }
+  .ic { width:82px; height:82px; border-radius:20px; flex:none; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:30px; }
+  .ic-kakao { background:#FEE500; color:#3A1D1D; } .ic-mail { background:#1E88FF; color:#fff; }
+  .ic-excel { background:#107C41; color:#fff; font-size:44px; } .ic-inquiry { background:#7B61FF; color:#fff; font-size:46px; }
+  .ic-memo { background:#FF9F0A; color:#fff; }
+  .nb { flex:1; min-width:0; }
+  .nh { display:flex; justify-content:space-between; font-size:24px; color:#6b6b70; font-weight:500; }
+  .nt { font-size:33px; font-weight:700; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .nd { font-size:29px; color:#3c3c43; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* ---------- desktop windows ---------- */
+  .win { position:absolute; background:#18181B; border:2px solid #2E2E33; border-radius:24px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.6); }
+  .win.active { border-color:#fff; box-shadow:0 0 0 4px rgba(255,255,255,.18),0 30px 80px rgba(0,0,0,.6); }
+  .tb { height:58px; background:#242428; display:flex; align-items:center; padding:0 20px; gap:10px; position:relative; }
+  .tb i { width:16px; height:16px; border-radius:50%; display:block; }
+  .tb span { position:absolute; left:0; right:0; text-align:center; font-size:25px; color:#b5b5bb; font-weight:700; }
+  .bub { background:#2C2C30; border-radius:22px; padding:14px 22px; font-size:28px; margin:14px 20px 0 76px; position:relative; width:fit-content; max-width:360px; }
+  .bub::before { content:''; position:absolute; left:-60px; top:4px; width:46px; height:46px; border-radius:16px; background:#3d3d44; }
+  .row { display:flex; align-items:center; gap:14px; height:82px; padding:0 22px; border-bottom:1px solid #26262a; font-size:26px; }
+  .row b { width:112px; flex:none; font-weight:700; } .row em { font-style:normal; color:#9a9aa1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .row .dot { width:12px; height:12px; border-radius:50%; background:#1E88FF; flex:none; }
+  .search { margin:16px 20px; height:58px; border-radius:14px; background:#26262B; display:flex; align-items:center; padding:0 18px; font-size:26px; color:#ddd; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); font-size:23px; }
+  .grid div { height:62px; border-right:1px solid #2a2a2e; border-bottom:1px solid #2a2a2e; display:flex; align-items:center; padding:0 10px; color:#c9c9cf; overflow:hidden; white-space:nowrap; }
+  .grid .h { background:#107C41; color:#fff; font-weight:700; }
+  .memo { padding:24px 30px; font-size:34px; line-height:1.75; color:#e6e6e6; font-weight:500; }
+  .memo p { position:relative; width:fit-content; }
+  .memo .mk { position:absolute; left:-6px; right:-6px; bottom:6px; height:22px; background:rgba(245,165,36,.45); transform-origin:left; z-index:-1; }
+  .qm { position:absolute; font-size:84px; font-weight:900; color:var(--human); }
+  .counter { position:absolute; left:540px; top:92px; transform:translate(-50%,-50%); background:#2a0f10; border:2px solid #FF5A5F;
+             color:#fff; border-radius:60px; padding:14px 34px; font-size:36px; font-weight:700; white-space:nowrap; }
+  .counter b { color:#FF5A5F; font-weight:900; font-size:44px; margin-left:10px; }
+  .chip-fly { position:absolute; background:#1E88FF; color:#fff; font-weight:700; font-size:26px; padding:10px 18px; border-radius:12px; white-space:nowrap; }
+  .keycap { position:absolute; background:#fff; color:#000; font-weight:900; font-size:30px; padding:8px 18px; border-radius:12px; white-space:nowrap; }
+  .band { position:absolute; left:0; right:0; }
+
+  /* ---------- flow ---------- */
+  .node { position:absolute; transform:translate(-50%,-50%); background:#141418; border:2px solid #3a3a40; border-radius:28px;
+          display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .node .l { font-size:44px; font-weight:900; } .node .s { font-size:26px; color:#9a9aa1; margin-top:4px; }
+  .lane { position:absolute; transform:translate(-50%,-50%); width:310px; height:150px; border-radius:26px; background:#101014;
+          border:3px solid; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .lane .l { font-size:40px; font-weight:900; white-space:nowrap; } .lane .s { font-size:25px; color:#a8a8ae; margin-top:2px; }
+  .lane .c { position:absolute; top:-22px; right:-16px; min-width:52px; height:52px; border-radius:26px; font-size:30px; font-weight:900; color:#000;
+             display:flex; align-items:center; justify-content:center; padding:0 12px; }
+  .chip { position:absolute; left:0; top:0; width:290px; height:60px; border-radius:16px; background:#2A2A2F; border:2px solid #55555c;
+          display:flex; align-items:center; gap:12px; padding:0 14px; font-size:27px; font-weight:700; white-space:nowrap; will-change:transform; }
+  .chip .tg { font-size:19px; font-weight:900; padding:3px 9px; border-radius:8px; color:#000; background:#888; }
+
+  /* ---------- dashboard ---------- */
+  .dash { position:absolute; left:60px; top:380px; width:960px; height:1390px; background:#0F0F12; border:2px solid #2a2a30; border-radius:44px; padding:56px 60px; }
+  .dh { display:flex; justify-content:space-between; align-items:center; }
+  .dh .t { font-size:46px; font-weight:900; } .dh .live { font-size:28px; color:var(--ok); font-weight:700; }
+  .kpis { display:flex; gap:30px; margin-top:44px; }
+  .kpi { width:260px; height:220px; border-radius:28px; background:#16161b; border:2px solid #26262c; padding:26px; }
+  .kpi .kl { font-size:28px; color:#a8a8ae; font-weight:700; } .kpi .kv { font-size:100px; font-weight:900; line-height:1.15; }
+  .sbar { margin-top:38px; height:24px; border-radius:12px; background:#1d1d22; display:flex; overflow:hidden; }
+  .sbar div { height:100%; }
+  .rv-t { font-size:34px; font-weight:900; margin-top:52px; margin-bottom:10px; }
+  .rv { display:flex; align-items:center; gap:22px; height:112px; border-bottom:1px solid #222228; font-size:31px; font-weight:500; }
+  .av { width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:28px; color:#000; flex:none; }
+  .pill { margin-left:auto; font-size:24px; font-weight:900; padding:8px 18px; border-radius:30px; border:2px solid; white-space:nowrap; }
+  .pend { position:absolute; left:60px; right:60px; bottom:56px; height:190px; border-radius:30px; background:#0c1f12; border:2px solid #1f5c30;
+          display:flex; align-items:center; justify-content:space-between; padding:0 44px; }
+  .pend .pl { font-size:38px; font-weight:700; } .pend .pv { font-size:104px; font-weight:900; color:var(--ok); }
+
+  /* ---------- compare / cta ---------- */
+  .panel { position:absolute; left:0; width:1080px; height:960px; overflow:hidden; }
+  .tag { display:inline-block; font-size:34px; font-weight:900; letter-spacing:.12em; padding:10px 26px; border-radius:40px; }
+  .svc { position:absolute; left:540px; transform:translate(-50%,-50%); border:2px solid #444; border-radius:60px; padding:18px 40px; font-size:44px; font-weight:700; color:#d8d8dc; white-space:nowrap; }
+  .btn { position:absolute; left:540px; width:900px; height:156px; border-radius:80px; background:#fff; color:#000; display:flex; align-items:center; justify-content:center;
+         font-size:56px; font-weight:900; white-space:nowrap; letter-spacing:-0.03em; }
+  .ring { position:absolute; left:540px; width:900px; height:156px; border-radius:80px; border:4px solid #fff; }
+  .logo-ph { width:120px; height:120px; border-radius:30px; border:3px dashed #666; display:flex; align-items:center; justify-content:center; color:#777; font-size:26px; font-weight:900; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+/* =====================================================================
+   SHORTFORM ENGINE  —  window.CONFIG 를 받아 render(t) 로 매 프레임을 그린다.
+   구조(장면 순서·연출)는 이 파일, 내용(문구·데이터)은 episodes/<에피소드>/config.json
+   ===================================================================== */
+const C = window.CONFIG;
+const W = 1080, H = 1920;
+const T = Object.assign({
+  hook:0, stop:1.5, stopHit:1.9, before:2.5, beat:0.5, chaos:5.0, turn:7.0, turnMorph:7.3, turnText:8.0, turnOut:9.6,
+  after:10.0, afterWords:[10.5,12.0,13.5], chipStart:10.55, chipGap:0.28, gather:14.55, result:15.0,
+  compare:17.0, core:18.5, core2:19.4, cta:21.0, end:25.0
+}, C.timeline || {});
+const LANE_COLOR = {}; C.after.lanes.forEach(l => LANE_COLOR[l.key] = l.color);
+const LANE_IDX = {}; C.after.lanes.forEach((l,i) => LANE_IDX[l.key] = i);
+
+/* ---------- helpers ---------- */
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const P=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,x)=>a+(b-a)*x;
+const eExpo=x=>x>=1?1:1-Math.pow(2,-10*x);
+const eCubic=x=>1-Math.pow(1-x,3);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eBack=x=>{const c1=1.9,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const R = rng(20260925);
+const stage = document.getElementById('stage');
+function mk(tag, cls, parent, html){const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; (parent||stage).appendChild(e); return e;}
+function layer(){const l=mk('div','layer'); l.style.display='block'; return l;}
+function svgEl(tag, attrs, parent){const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e;}
+function svgLayer(parent){return svgEl('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`,style:'position:absolute;left:0;top:0;overflow:visible'},parent);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+// 큰 글씨: 가로폭에 맞춰 자동 축소
+function bigText(parent, text, y, size, maxW=980, color='#fff'){
+  const e=mk('div','txt',parent,text); e.style.top=y+'px'; e.style.color=color; e.style.fontSize=size+'px';
+  e.style.visibility='hidden'; e.style.display='block';
+  let s=size; while(e.offsetWidth>maxW && s>30){s-=2; e.style.fontSize=s+'px';}
+  e.style.visibility=''; e.style.opacity=0; return e;
+}
+function setTx(e,{x=0,y=0,s=1,o=1,r=0}={}){e.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px) scale(${s}) rotate(${r}deg)`; e.style.opacity=o;}
+// 박자에 맞춰 "쾅" 들어오는 글자
+function punch(e,t,t0,t1=1e9,from=1.35){
+  if(t<t0||t>=t1){e.style.opacity=0;return;}
+  const p=eExpo(P(t,t0,t0+0.28)); setTx(e,{s:lerp(from,1,p),o:P(t,t0,t0+0.05)});
+}
+const CUES = {hits:[], words:[], clicks:[], whoosh:[], ticks:[], silence:[], chipLand:[]};
+
+/* =====================================================================
+   1) HOOK — 알림 폭탄
+   ===================================================================== */
+const Lhook = layer();
+// 실사 배경 (선택): config.hook.background → render.js 가 프레임을 뽑아 window.HOOK_BG 로 넘겨줌
+const HB = window.HOOK_BG, hbImgs = [];
+let hbCanvas = null, hbCtx = null, hbShade = null;
+if (HB && HB.count) {
+  for (let i = 0; i < HB.count; i++) { const im = new Image(); im.src = HB.base + String(i + 1).padStart(3, '0') + '.jpg'; hbImgs.push(im); }
+  hbCanvas = mk('canvas', 'abs', Lhook); hbCanvas.width = W; hbCanvas.height = H; Object.assign(hbCanvas.style, {left:0, top:0, width:W+'px', height:H+'px', zIndex:0});
+  hbCtx = hbCanvas.getContext('2d');
+  const d = HB.dim != null ? HB.dim : 0.5;
+  hbShade = mk('div', 'abs', Lhook); Object.assign(hbShade.style, {inset:0, zIndex:0,
+    background:`radial-gradient(ellipse at 50% 45%,rgba(0,0,0,${d*0.7}) 0%,rgba(0,0,0,${Math.min(1,d+0.3)}) 100%),linear-gradient(180deg,rgba(8,10,20,.35),rgba(0,0,0,0) 40%,rgba(0,0,0,.4))`});
+}
+window.ASSETS_READY = Promise.all(hbImgs.map(im => im.decode().catch(() => {})));
+function renderHookBg(t){
+  if (!hbCtx) return;
+  const im = hbImgs[Math.min(hbImgs.length - 1, Math.max(0, Math.floor(t * (HB.fps || 30))))];
+  if (!im || !im.complete || !im.naturalWidth) return;
+  const s = 1.1 - 0.06 * eCubic(P(t, 0, 1.5));   // 천천히 당겨지는 느낌 (알림 줌과 반대 방향)
+  const w = W * s, h = H * s;
+  hbCtx.drawImage(im, (W - w) / 2, (H - h) / 2, w, h);
+}
+const ICON = {kakao:'TALK', mail:'✉', excel:'X', inquiry:'?', memo:'≡'};
+const notis = C.hook.notifications.map((n,i)=>{
+  const e=mk('div','noti',Lhook,`<div class="ic ic-${n.app}">${ICON[n.app]||'•'}</div><div class="nb"><div class="nh"><span>${esc(n.name)}</span><span>지금</span></div><div class="nt">${esc(n.title)}</div><div class="nd">${esc(n.body)}</div></div>`);
+  const slots=[160,1480,420,1260,700,1640,300,1080,1560,560,1380,220,1180,860];
+  return {e, t0:-0.3+i*0.105, x:130+(R()-.5)*120, y:slots[i%slots.length]+(R()-.5)*60, r:(R()-.5)*9};
+});
+notis.forEach(n=>{if(n.t0>0) CUES.ticks.push(n.t0);});
+const hookShade = mk('div','band',Lhook); Object.assign(hookShade.style,{top:'620px',height:'700px',background:'linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.88) 25%,rgba(0,0,0,.88) 75%,rgba(0,0,0,0))'});
+const hook1 = bigText(Lhook, esc(C.hook.lines[0]), 880, 122);
+const hook2 = bigText(Lhook, esc(C.hook.lines[1]), 1045, 122);
+CUES.hits.push({t:0,k:'stab'}, {t:0.75,k:'stab'});
+function renderHook(t){
+  renderHookBg(t);
+  const z=1+0.05*P(t,0,1.5);
+  notis.forEach((n,i)=>{
+    if(t<n.t0){n.e.style.opacity=0;return;}
+    const p=eExpo(P(t,n.t0,n.t0+0.22));
+    n.e.style.left=n.x+'px'; n.e.style.top=n.y+'px';
+    const shake = (t-n.t0<0.12)? Math.sin((t-n.t0)*160)*6 : 0;
+    n.e.style.transform=`translate(0,${lerp(-140,0,p)}px) scale(${lerp(1.18,1,p)*z}) rotate(${n.r+shake*0.2}deg)`;
+    n.e.style.opacity=clamp(P(t,n.t0,n.t0+0.06))*(1-0.25*P(t,n.t0+0.6,n.t0+1.2));
+    n.e.style.zIndex=i;
+  });
+  hookShade.style.zIndex=100; hook1.style.zIndex=101; hook2.style.zIndex=101;
+  hookShade.style.opacity=0.75+0.25*P(t,0,0.4);
+  // 첫 프레임부터 글자가 보이도록 (0초에 이미 70% 등장)
+  const p1=eExpo(P(t,-0.12,0.2)); setTx(hook1,{s:lerp(1.3,1,p1),o:clamp(p1*1.4),y:lerp(90,0,eExpo(P(t,0.75,1.0)))*0 - 0});
+  hook1.style.opacity = t<0.75?1: 0.55; hook1.style.color = t<0.75?'#fff':'#cfcfcf';
+  punch(hook2,t,0.75);
+}
+
+/* =====================================================================
+   2) STOP — "아니요."
+   ===================================================================== */
+const Lstop = layer();
+const noTxt = bigText(Lstop, esc(C.stop.text), 960, 230);
+CUES.silence.push([T.stop, T.stopHit]); CUES.hits.push({t:T.stopHit,k:'impact'});
+function renderStop(t){
+  punch(noTxt,t,T.stopHit,1e9,1.7);
+  const d=t-T.stopHit; const sh = d>0&&d<0.2 ? (1-d/0.2)*14 : 0;
+  Lstop.style.transform=`translate(${Math.sin(d*90)*sh}px,${Math.cos(d*70)*sh}px)`;
+}
+
+/* =====================================================================
+   3) BEFORE + CHAOS — 업무창 데스크톱
+   ===================================================================== */
+const Ldesk = layer(); Ldesk.style.background='radial-gradient(ellipse at 50% 40%,#17171b 0%,#050506 75%)';
+const deskInner = mk('div','abs',Ldesk); Object.assign(deskInner.style,{inset:0});
+const WB = C.before.windows;
+const WINS = {
+  chat:{x:36,y:190,w:490,h:650}, mail:{x:554,y:190,w:490,h:650},
+  sheet:{x:36,y:870,w:490,h:600}, memo:{x:554,y:870,w:490,h:600}
+};
+const DOTS='<i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i>';
+for(const k in WINS){const g=WINS[k]; g.e=mk('div','win',deskInner,`<div class="tb">${DOTS}<span>${esc(WB[k].title)}</span></div><div class="bd"></div>`);
+  Object.assign(g.e.style,{left:g.x+'px',top:g.y+'px',width:g.w+'px',height:g.h+'px'}); g.bd=g.e.querySelector('.bd'); g.jx=R()*10; g.jy=R()*10;}
+// chat
+const bubbles = WB.chat.bubbles.map(b=>mk('div','bub',WINS.chat.bd,esc(b)));
+// mail
+const searchBox = mk('div','search',WINS.mail.bd,'🔍 <span></span>'); const searchSpan=searchBox.querySelector('span');
+searchBox.firstChild.textContent='⌕ ';
+const mailRows = WB.mail.rows.map(r=>mk('div','row',WINS.mail.bd,`<span class="dot"></span><b>${esc(r[0])}</b><em>${esc(r[1])}</em>`));
+const mailTarget = Math.max(0, WB.mail.rows.findIndex(r=>r[1].includes('2381')));
+// sheet
+const grid = mk('div','grid',WINS.sheet.bd);
+WB.sheet.cols.forEach(c=>mk('div','h',grid,esc(c)));
+const sheetData=[['9/24','김OO','교환','완료'],['9/24','(주)한빛','견적','?'],['9/25','이OO','배송','확인중'],['9/25','박OO','환불','??'],['9/25','','',''],['','','',''],['','','',''],['','','','']];
+const pasteRow=4; const pasteVals=['9/25','최OO','문의','확인중'];
+const cells = sheetData.map(r=>r.map(v=>mk('div','',grid,esc(v))));
+// memo
+const memoBox = mk('div','memo',WINS.memo.bd);
+const memoLines = WB.memo.lines.map(l=>{const p=mk('p','',memoBox,`<span class="mk"></span>${esc(l)}`); return p;});
+const qms = [0,1,2].map(i=>{const q=mk('div','qm',WINS.memo.e,'?'); q.style.left=(300+i*55)+'px'; q.style.top=(70+i*40)+'px'; return q;});
+// counter / cursor / flying chip / keycaps
+const counter = mk('div','counter',Ldesk,`${esc(C.before.counterLabel)}<b>0</b>건`); const counterB=counter.querySelector('b');
+const flyChip = mk('div','chip-fly',Ldesk,'주문번호 2381');
+const keyC = mk('div','keycap',Ldesk,'Ctrl+C'), keyV = mk('div','keycap',Ldesk,'Ctrl+V');
+// chaos lines
+const lineSvg = svgLayer(Ldesk);
+const NL = 30; const LINES=[];
+const wKeys=Object.keys(WINS);
+function randPt(k){const g=WINS[k];return [g.x+40+R()*(g.w-80), g.y+80+R()*(g.h-120)];}
+for(let j=0;j<NL;j++){
+  const a=wKeys[j%4], b=wKeys[(j+1+Math.floor(R()*3))%4];
+  const p0=randPt(a), p1=randPt(b);
+  const c1=[R()*W, 150+R()*1400], c2=[R()*W, 150+R()*1400];
+  const red = R()<0.3;
+  const path=svgEl('path',{fill:'none',stroke:red?'#FF5A5F':'#fff','stroke-width':red?6:4,'stroke-linecap':'round',opacity:0},lineSvg);
+  const ty = 330 + j*(1260/(NL-1));
+  LINES.push({path, src:[p0,c1,c2,p1], dst:[[80,ty],[380,ty],[700,ty],[1000,ty]], t0:T.chaos+j*(1.75/NL), red, len:0});
+}
+const glowRed = mk('div','abs',Ldesk); Object.assign(glowRed.style,{inset:0,boxShadow:'inset 0 0 260px rgba(255,40,40,.9)',pointerEvents:'none'});
+// word band
+const wordShade = mk('div','band',Ldesk); Object.assign(wordShade.style,{top:'1480px',height:'440px',background:'linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.92) 30%)'});
+const words = C.before.words.map(w=>bigText(Ldesk, esc(w), 1680, 190));
+const cap1 = bigText(Ldesk, esc(C.before.chaosCaption[0]), 1620, 120);
+const cap2 = bigText(Ldesk, esc(C.before.chaosCaption[1]), 1770, 120);
+// cursor
+const cursor = mk('div','abs',Ldesk,`<svg width="64" height="64" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15.5 L12.5 22 L15.5 20.6 L12.2 14.2 L19 14.2 Z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg>`);
+const ripple = mk('div','abs',Ldesk); Object.assign(ripple.style,{width:'90px',height:'90px',borderRadius:'50%',border:'5px solid #fff'});
+// cursor key-frames (시간, x, y)
+const b0=T.before, bt=T.beat;
+const CK=[[b0-0.01,540,1300],[b0+0.12,300,560],[b0+bt,300,560],[b0+bt+0.12,760,300],[b0+2*bt,760,300],
+  [b0+2*bt+0.1,800,258+64+mailTarget*82+40],[b0+2*bt+0.16,800,258+64+mailTarget*82+40],[b0+2*bt+0.36,260,870+58+62*(pasteRow+1)+30],
+  [b0+3*bt,260,870+58+62*(pasteRow+1)+30],[b0+3*bt+0.12,760,1090],[b0+4*bt,760,1090],[b0+4*bt+0.1,250,470],[b0+4*bt+0.24,250,470],[b0+4*bt+0.36,330,1150],[T.chaos,330,1150]];
+const CLICKS=[b0+0.12,b0+bt+0.12,b0+2*bt+0.1,b0+2*bt+0.36,b0+3*bt+0.12,b0+4*bt+0.1,b0+4*bt+0.36];
+for(let i=0;i<10;i++){const tt=T.chaos+0.05+i*0.19; CK.push([tt,120+R()*840,260+R()*1150]); CLICKS.push(tt);}
+CK.push([T.turn,540,900]);
+CLICKS.forEach(c=>CUES.clicks.push(c));
+C.before.words.forEach((w,i)=>CUES.words.push(b0+i*bt));
+CUES.words.push(T.chaos); CUES.words.push(T.chaos+0.5);
+function cursorAt(t){
+  for(let i=0;i<CK.length-1;i++){const a=CK[i],b=CK[i+1]; if(t>=a[0]&&t<=b[0]){const p=eInOut(P(t,a[0],b[0])); return [lerp(a[1],b[1],p),lerp(a[2],b[2],p)];}}
+  const l=t<CK[0][0]?CK[0]:CK[CK.length-1]; return [l[1],l[2]];
+}
+function bez(pts,u){const [a,b,c,d]=pts; const m=1-u; return [0,1].map(k=>m*m*m*a[k]+3*m*m*u*b[k]+3*m*u*u*c[k]+u*u*u*d[k]);}
+function lineD(pts){return `M${pts[0][0]},${pts[0][1]} C${pts[1][0]},${pts[1][1]} ${pts[2][0]},${pts[2][1]} ${pts[3][0]},${pts[3][1]}`;}
+
+function renderDesk(t, freezeT){
+  const tf = freezeT!=null? Math.min(t,freezeT) : t;   // 정지 구간에선 시간 고정
+  const beat = Math.floor((tf-b0)/bt);            // 0..4 (BEFORE 단어 인덱스)
+  const chaos = P(tf,T.chaos,T.turn);
+  // windows: active highlight + chaos jitter
+  const actMap=['chat','mail','sheet','memo', null];
+  let act = (beat>=0&&beat<4)? actMap[beat] : null;
+  if(beat===2 && tf-(b0+2*bt)<0.16) act='mail';
+  if(beat===4){ act = (tf-(b0+4*bt))<0.24 ? 'chat':'sheet'; }
+  const amp = 22*chaos*chaos;
+  for(const k in WINS){const g=WINS[k];
+    const on = act===k && chaos===0;
+    g.e.classList.toggle('active', on);
+    const jx=Math.sin(tf*37+g.jx*9)*amp, jy=Math.cos(tf*41+g.jy*9)*amp, jr=Math.sin(tf*23+g.jx)*amp*0.08;
+    g.e.style.transform=`translate(${jx}px,${jy}px) rotate(${jr}deg) scale(${on?1.03:1})`;
+    g.e.style.opacity = (act && !on && beat<4)? 0.5 : 1;
+    g.e.style.zIndex = on?5:1;
+  }
+  // chat bubbles 차례로
+  bubbles.forEach((b,i)=>{const tt=b0-0.3+i*0.28; b.style.opacity= tf>=tt?1:0; b.style.transform=`scale(${tf>=tt?lerp(0.85,1,eExpo(P(tf,tt,tt+0.15))):0.85})`;});
+  // mail search typing + scan
+  const q=WB.mail.search; const n=Math.floor(clamp((tf-(b0+bt+0.1))/0.3)*q.length);
+  searchSpan.textContent = q.slice(0,n) + ((tf>b0+bt && tf<b0+2*bt && Math.floor(tf*8)%2)?'|':'');
+  const scanP = P(tf,b0+bt+0.15,b0+bt+0.45); const scanIdx = Math.round(scanP*mailTarget);
+  mailRows.forEach((r,i)=>{ r.style.background = (tf>b0+bt+0.15 && i===scanIdx && tf<b0+3*bt)?'rgba(30,136,255,.28)':''; });
+  // copy → paste
+  const cpT0=b0+2*bt+0.12, cpT1=b0+2*bt+0.36;
+  if(tf>=cpT0 && tf<cpT1+0.05){const p=eInOut(P(tf,cpT0,cpT1)); const [cx,cy]=cursorAt(tf); flyChip.style.opacity=1; flyChip.style.left=(cx+24)+'px'; flyChip.style.top=(cy+20)+'px'; flyChip.style.transform=`scale(${1+0.1*Math.sin(p*3.14)})`;} else flyChip.style.opacity=0;
+  keyC.style.opacity = (tf>=b0+2*bt+0.08&&tf<b0+2*bt+0.3)?1:0; keyC.style.left='640px'; keyC.style.top=(258+64+mailTarget*82-20)+'px';
+  keyV.style.opacity = (tf>=cpT1&&tf<cpT1+0.25)?1:0; keyV.style.left='300px'; keyV.style.top=(870+58+62*(pasteRow+1)-40)+'px';
+  cells[pasteRow].forEach((c,i)=>{c.textContent = tf>=cpT1 ? pasteVals[i] : ''; c.style.background = (tf>=cpT1&&tf<cpT1+0.4)?'rgba(16,124,65,.45)':'';});
+  // memo 판단
+  const jT=b0+3*bt;
+  memoLines.forEach((p,i)=>{const mkr=p.querySelector('.mk'); mkr.style.transform=`scaleX(${eCubic(P(tf,jT+0.1+i*0.07,jT+0.25+i*0.07))})`;});
+  qms.forEach((q,i)=>{const tt=jT+0.15+i*0.08; q.style.opacity=tf>=tt?1:0; q.style.transform=`scale(${tf>=tt?eBack(P(tf,tt,tt+0.18)):0}) rotate(${(i-1)*12}deg)`;});
+  // counter
+  const v = Math.round(lerp(C.before.counterFrom, C.before.counterTo, eInOut(P(tf,b0,T.turn-0.3))));
+  counterB.textContent=v; counter.style.transform=`translate(-50%,-50%) scale(${1+0.06*Math.abs(Math.sin(tf*25))*(chaos>0?1:0.3)})`;
+  // cursor
+  const [cx,cy]=cursorAt(tf); cursor.style.left=(cx-12)+'px'; cursor.style.top=(cy-8)+'px'; cursor.style.zIndex=50;
+  let rp=-1; CLICKS.forEach(c=>{if(tf>=c&&tf<c+0.22) rp=c;});
+  if(rp>=0){const p=P(tf,rp,rp+0.22); const [rx,ry]=cursorAt(rp); Object.assign(ripple.style,{left:(rx-45)+'px',top:(ry-45)+'px',opacity:1-p,transform:`scale(${0.3+p})`,zIndex:49});} else ripple.style.opacity=0;
+  // chaos lines
+  LINES.forEach(L=>{
+    if(tf<L.t0){L.path.setAttribute('opacity',0);return;}
+    L.path.setAttribute('d',lineD(L.src.map((pt,i)=>[pt[0]+Math.sin(tf*9+i+L.t0*10)*amp*1.5, pt[1]+Math.cos(tf*8+i)*amp*1.5])));
+    if(!L.len) L.len=L.path.getTotalLength();
+    const p=eCubic(P(tf,L.t0,L.t0+0.25));
+    L.path.setAttribute('stroke-dasharray',L.len); L.path.setAttribute('stroke-dashoffset',L.len*(1-p)); L.path.setAttribute('opacity',L.red?0.9:0.75);
+  });
+  lineSvg.style.zIndex=30;
+  glowRed.style.opacity = 0.55*chaos; glowRed.style.zIndex=31;
+  // words (한 박자에 한 단어)
+  wordShade.style.zIndex=60;
+  words.forEach((w,i)=>{w.style.zIndex=61; punch(w,tf,b0+i*bt,b0+(i+1)*bt,1.45);});
+  cap1.style.zIndex=61; cap2.style.zIndex=61;
+  if(tf>=T.chaos){punch(cap1,tf,T.chaos,1e9,1.3); punch(cap2,tf,T.chaos+0.5,1e9,1.3);} else {cap1.style.opacity=0;cap2.style.opacity=0;}
+  // chaos: 화면 흔들림
+  deskInner.style.transform=`translate(${Math.sin(tf*53)*amp*0.4}px,${Math.cos(tf*47)*amp*0.4}px)`;
+}
+
+/* =====================================================================
+   4) TURNING POINT — 정지 → 선이 펴짐 → "일의 구조입니다."
+   ===================================================================== */
+const Lturn = layer();
+const turnSvg = svgLayer(Lturn);
+const TL = LINES.map(L=>svgEl('path',{fill:'none',stroke:'#fff','stroke-width':4,'stroke-linecap':'round'},turnSvg));
+const turnTxt = bigText(Lturn, esc(C.turn.text), 960, 170);
+const flash = mk('div','abs',stage); Object.assign(flash.style,{inset:0,background:'#fff',opacity:0,zIndex:999,pointerEvents:'none'});
+CUES.silence.push([T.turn, T.turnMorph]); CUES.whoosh.push({t:T.turnMorph,d:0.65,k:'riser'}); CUES.hits.push({t:T.turnText,k:'impact'});
+function frozenPts(L){ const tf=T.turn-0.001, amp=22; return L.src.map((pt,i)=>[pt[0]+Math.sin(tf*9+i+L.t0*10)*amp*1.5, pt[1]+Math.cos(tf*8+i)*amp*1.5]); }
+LINES.forEach(L=>L.frozen=frozenPts(L));
+function renderTurn(t){
+  const out=P(t,T.turnOut,T.after);
+  LINES.forEach((L,j)=>{
+    const p=eInOut(P(t,T.turnMorph+j*0.005,T.turnText-0.08+j*0.002));
+    // 글자 자리 비우기
+    const cl = eExpo(P(t,T.turnText,T.turnText+0.4));
+    const pts = L.frozen.map((a,i)=>{const b=L.dst[i]; let y=lerp(a[1],b[1],p); const dy=y-960; if(Math.abs(dy)<190) y+= Math.sign(dy||1)*(190-Math.abs(dy))*cl; return [lerp(a[0],b[0],p), y];});
+    // 마지막: 가운데 한 줄(흐름의 줄기)로 모임
+    const q=eInOut(out); const fin=pts.map((pt,i)=>[lerp(pt[0],540,q), lerp(pt[1], [440,560,760,860][i], q)]);
+    TL[j].setAttribute('d',lineD(fin));
+    TL[j].setAttribute('stroke', p<0.5 && L.red ? '#FF5A5F':'#fff');
+    TL[j].setAttribute('opacity', lerp(0.9, 0.28, cl) * (t<T.turnText?1:1) );
+    TL[j].setAttribute('stroke-width', lerp(L.red?6:4, 3, p));
+  });
+  if(t>=T.turnText){ const p=eExpo(P(t,T.turnText,T.turnText+0.3)); setTx(turnTxt,{s:lerp(1.5,1,p)*(1+0.035*P(t,T.turnText,T.turnOut)), o:clamp(P(t,T.turnText,T.turnText+0.05))*(1-out), y:-60*eInOut(out)}); } else turnTxt.style.opacity=0;
+}
+
+/* =====================================================================
+   5) AFTER — 문의 카드가 세 갈래로 슉슉
+   ===================================================================== */
+const Lflow = layer();
+const flowWrap = mk('div','abs',Lflow); Object.assign(flowWrap.style,{inset:0});
+const fSvg = svgLayer(flowWrap);
+const NODE_IN={x:540,y:560}, NODE_CL={x:540,y:860}, LANE_Y=1150, SLOT_Y=1300, SLOT_GAP=72;
+const LX=[195,540,885];
+const nIn = mk('div','node',flowWrap,`<div class="l">${esc(C.after.input)}</div>`); Object.assign(nIn.style,{left:NODE_IN.x+'px',top:NODE_IN.y+'px',width:'480px',height:'124px'});
+const nCl = mk('div','node',flowWrap,`<div class="l">${esc(C.after.classifier)}</div><div class="s">${esc(C.after.classifierSub)}</div>`); Object.assign(nCl.style,{left:NODE_CL.x+'px',top:NODE_CL.y+'px',width:'520px',height:'150px'});
+const trunkIn = svgEl('path',{d:`M540,-40 L540,${NODE_IN.y-62}`,stroke:'#fff','stroke-width':3,opacity:.35,fill:'none','stroke-dasharray':'8 14'},fSvg);
+const trunk = svgEl('path',{d:`M540,${NODE_IN.y+62} L540,${NODE_CL.y-75}`,stroke:'#fff','stroke-width':4,fill:'none'},fSvg);
+const branches = C.after.lanes.map((l,i)=>{
+  const d=`M540,${NODE_CL.y+75} C540,${NODE_CL.y+170} ${LX[i]},${LANE_Y-170} ${LX[i]},${LANE_Y-75}`;
+  const p=svgEl('path',{d,stroke:l.color,'stroke-width':5,fill:'none','stroke-linecap':'round'},fSvg);
+  return p;
+});
+const laneEls = C.after.lanes.map((l,i)=>{const e=mk('div','lane',flowWrap,`<div class="l">${esc(l.label)}</div><div class="s">${esc(l.sub)}</div><div class="c" style="background:${l.color}">0</div>`);
+  Object.assign(e.style,{left:LX[i]+'px',top:LANE_Y+'px',borderColor:l.color,boxShadow:`0 0 0 0 ${l.color}`}); e.cnt=e.querySelector('.c'); return e;});
+const flowWords = C.after.words.map(w=>bigText(Lflow, esc(w), 250, 128));
+const TAG = {ai:'AI', human:'사람', exception:'전달'};
+// chips
+const laneCount=[0,0,0];
+const CHIPS = C.after.items.map((it,i)=>{
+  const li = LANE_IDX[it.lane]; const slot = laneCount[li]++;
+  const e = mk('div','chip',flowWrap,`<span class="tg">${TAG[it.lane]||''}</span><span>${esc(it.text)}</span>`);
+  const t0 = T.chipStart + i*T.chipGap;
+  CUES.whoosh.push({t:t0+0.28,d:0.2,k:'swish'}); CUES.chipLand.push(t0+0.72);
+  return {e, it, li, slot, t0, tg:e.querySelector('.tg')};
+});
+function chipPos(c,t){
+  const s=t-c.t0; const lx=LX[c.li]; const sy=SLOT_Y+c.slot*SLOT_GAP;
+  const br=branches[c.li]; if(!br._len) br._len=br.getTotalLength();
+  if(s<0.2){const p=eCubic(s/0.2); return [540, lerp(-60,NODE_IN.y,p), 0];}
+  if(s<0.26) return [540, NODE_IN.y, 0];
+  if(s<0.4){const p=eInOut((s-0.26)/0.14); return [540, lerp(NODE_IN.y,NODE_CL.y,p), 0];}
+  if(s<0.46) return [540, NODE_CL.y, 1];
+  if(s<0.62){const p=eInOut((s-0.46)/0.16); const pt=br.getPointAtLength(br._len*p); return [pt.x,pt.y,1];}
+  if(s<0.72){const p=eCubic((s-0.62)/0.1); return [lx, lerp(LANE_Y-75,sy,p), 1];}
+  return [lx, sy, 1];
+}
+function renderFlow(t){
+  flowWrap.style.transform='';
+  const a=T.after;
+  // nodes
+  const pin=eBack(P(t,a,a+0.25)), pcl=eBack(P(t,a+0.25,a+0.5));
+  setTx(nIn,{s:pin,o:clamp(pin)}); setTx(nCl,{s:pcl,o:clamp(pcl)});
+  trunk.setAttribute('opacity',P(t,a,a+0.1)); trunkIn.setAttribute('opacity',0.35*P(t,a,a+0.2));
+  trunkIn.setAttribute('stroke-dashoffset', -t*120);
+  branches.forEach((b,i)=>{ if(!b._len) b._len=b.getTotalLength(); const p=eCubic(P(t,a+0.55+i*0.08,a+0.85+i*0.08)); b.setAttribute('stroke-dasharray',b._len); b.setAttribute('stroke-dashoffset',b._len*(1-p)); });
+  // emphasis
+  const w=T.afterWords; let focus=-1;
+  if(t>=w[1]&&t<w[2]) focus=LANE_IDX.human; else if(t>=w[2]&&t<T.gather-0.1) focus=LANE_IDX.ai;
+  laneEls.forEach((e,i)=>{const p=eBack(P(t,a+0.6+i*0.1,a+0.85+i*0.1)); const f= focus===i;
+    setTx(e,{s:p*(f?1.08:1),o:clamp(p)*(focus>=0&&!f?0.45:1)});
+    e.style.boxShadow = f? `0 0 60px ${C.after.lanes[i].color}` : 'none';
+    e.style.background = f? C.after.lanes[i].color+'33' : '#101014';
+    const n=CHIPS.filter(c=>c.li===i && t>=c.t0+0.72).length; e.cnt.textContent=n; });
+  branches.forEach((b,i)=>b.setAttribute('opacity', focus>=0&&focus!==i?0.3:1));
+  // classifier pulse on each chip
+  let pulse=0, pc='#3a3a40'; CHIPS.forEach(c=>{const s=t-c.t0; if(s>=0.38&&s<0.5){pulse=1-(s-0.38)/0.12; pc=LANE_COLOR[c.it.lane];}});
+  nCl.style.borderColor = pulse>0? pc : '#3a3a40'; nCl.style.boxShadow = pulse>0? `0 0 ${50*pulse}px ${pc}`:'none';
+  let pin2=0; CHIPS.forEach(c=>{const s=t-c.t0; if(s>=0.18&&s<0.3) pin2=1;}); nIn.style.borderColor=pin2?'#fff':'#3a3a40';
+  // chips
+  CHIPS.forEach(c=>{
+    if(t<c.t0){c.e.style.opacity=0;return;}
+    const [x,y,cls]=chipPos(c,t);
+    let gx=x, gy=y, sc=1, op=1;
+    // gather → 대시보드 KPI 로 빨려 들어감
+    if(t>=T.gather){const g=eInOut(P(t,T.gather+c.li*0.04+c.slot*0.015,T.gather+0.42+c.li*0.04)); gx=lerp(x,KPI_C[c.li][0],g); gy=lerp(y,KPI_C[c.li][1],g); sc=lerp(1,0.3,g); op=1-P(g,0.75,1);}
+    c.e.style.transform=`translate(${gx-145}px,${gy-30}px) scale(${sc})`; c.e.style.opacity=op;
+    const col=LANE_COLOR[c.it.lane];
+    c.e.style.borderColor = cls? col : '#55555c'; c.e.style.background = cls? '#15151a':'#2A2A2F';
+    c.tg.style.background = cls? col : '#666'; c.tg.style.display = cls?'':'none';
+    c.e.style.zIndex=20;
+  });
+  // words
+  flowWords.forEach((e,i)=>{punch(e,t,w[i],i<w.length-1?w[i+1]:T.gather,1.4);});
+  // gather: 흐름 다이어그램 퇴장
+  const g=P(t,T.gather,T.gather+0.3);
+  [nIn,nCl,...laneEls].forEach(e=>{e.style.opacity=parseFloat(e.style.opacity||1)*(1-g);});
+  fSvg.style.opacity=1-g;
+}
+C.after.words.forEach((w,i)=>CUES.hits.push({t:T.afterWords[i],k:'stab'}));
+
+/* =====================================================================
+   6) RESULT — 대시보드
+   ===================================================================== */
+const Ldash = layer();
+const dashHead = bigText(Ldash, esc(C.result.headline||''), 230, 130);
+const dash = mk('div','dash',Ldash);
+dash.innerHTML = `<div class="dh"><div class="t">${esc(C.result.title)}</div><div class="live">● 실시간</div></div>
+<div class="kpis">${C.result.kpis.map(k=>`<div class="kpi"><div class="kl">${esc(k.label)}</div><div class="kv" style="color:${LANE_COLOR[k.lane]}">0</div></div>`).join('')}</div>
+<div class="sbar">${C.result.kpis.map(k=>`<div style="background:${LANE_COLOR[k.lane]}"></div>`).join('')}</div>
+<div class="rv-t">${esc(C.result.reviewTitle)}</div>
+${C.result.reviews.map(r=>`<div class="rv"><div class="av" style="background:${LANE_COLOR[r.lane]}">${esc(r.who)}</div><div>${esc(r.text)}</div><div class="pill" style="color:${LANE_COLOR[r.lane]};border-color:${LANE_COLOR[r.lane]}">${esc(r.status)}</div></div>`).join('')}
+<div class="pend"><div class="pl">${esc(C.result.pendingLabel)}</div><div class="pv"><span>0</span>건</div></div>`;
+const kvs=[...dash.querySelectorAll('.kv')], segs=[...dash.querySelectorAll('.sbar div')], rvs=[...dash.querySelectorAll('.rv')], pendV=dash.querySelector('.pv span'), pend=dash.querySelector('.pend');
+const KPI_C=[[60+60+130,380+56+60+44+110],[60+60+130+290,380+56+60+44+110],[60+60+130+580,380+56+60+44+110]];
+const kTot = C.result.kpis.reduce((s,k)=>s+k.value,0);
+CUES.hits.push({t:T.result,k:'soft'});
+function renderDash(t){
+  const a=T.gather+0.15;
+  const p=eExpo(P(t,a,a+0.45));
+  dash.style.opacity=clamp(P(t,a,a+0.15)); dash.style.transform=`translateY(${lerp(120,0,p)}px) scale(${lerp(0.94,1,p)})`;
+  punch(dashHead,t,T.result,1e9,1.3);
+  C.result.kpis.forEach((k,i)=>{kvs[i].textContent=Math.round(k.value*eCubic(P(t,a+0.2,a+0.9)));
+    segs[i].style.width = (100*k.value/kTot*eInOut(P(t,a+0.35,a+1.0)))+'%';});
+  rvs.forEach((r,i)=>{const pp=eExpo(P(t,a+0.5+i*0.12,a+0.8+i*0.12)); r.style.opacity=pp; r.style.transform=`translateX(${lerp(60,0,pp)}px)`;});
+  const pv=Math.round(lerp(C.before.counterTo, C.result.pendingValue, eInOut(P(t,T.result+0.3,T.result+1.3))));
+  pendV.textContent=pv; pend.style.opacity=clamp(P(t,a+0.3,a+0.5));
+  pend.style.boxShadow = pv===C.result.pendingValue && t>T.result+1.3 ? `0 0 ${40*(1-P(t,T.result+1.3,T.result+1.9))}px #34C759` : 'none';
+}
+
+/* =====================================================================
+   7) BEFORE / AFTER 비교
+   ===================================================================== */
+const Lcmp = layer();
+const pTop = mk('div','panel',Lcmp); pTop.style.top='0'; pTop.style.background='linear-gradient(180deg,#1a0708,#0a0303)';
+const pBot = mk('div','panel',Lcmp); pBot.style.top='960px'; pBot.style.background='linear-gradient(180deg,#040b18,#071a33)';
+const topSvg = svgEl('svg',{width:1080,height:960,style:'position:absolute;left:0;top:0'},pTop);
+const botSvg = svgEl('svg',{width:1080,height:960,style:'position:absolute;left:0;top:0'},pBot);
+const miniWins=[[160,330],[600,330],[160,620],[600,620]].map(([x,y])=>svgEl('rect',{x,y,width:320,height:230,rx:22,fill:'#1b1b1f',stroke:'#3a3a40','stroke-width':3},topSvg));
+const miniLines = LINES.slice(0,22).map(L=>svgEl('path',{d:lineD(L.src.map(p=>[p[0]*0.8+108, p[1]*0.4+250])),fill:'none',stroke:L.red?'#FF5A5F':'#fff','stroke-width':3,opacity:.7},topSvg));
+const topTxt = mk('div','abs',pTop,`<div class="tag" style="background:#FF5A5F;color:#000">${esc(C.compare.before.tag)}</div>`); Object.assign(topTxt.style,{left:'0',right:'0',top:'70px',textAlign:'center'});
+const topBig = bigText(pTop, esc(C.compare.before.text), 210, 96);
+// after mini flow
+const mb = (x,y,w,h,col)=>svgEl('rect',{x:x-w/2,y:y-h/2,width:w,height:h,rx:18,fill:'#0e1422',stroke:col,'stroke-width':3},botSvg);
+svgEl('path',{d:'M540,340 L540,430',stroke:'#fff','stroke-width':4},botSvg);
+const lanesMini=C.after.lanes.map((l,i)=>{const x=[250,540,830][i]; svgEl('path',{d:`M540,490 C540,560 ${x},560 ${x},620`,stroke:l.color,'stroke-width':4,fill:'none'},botSvg); return x;});
+mb(540,310,320,70,'#888'); mb(540,460,360,70,'#fff');
+C.after.lanes.forEach((l,i)=>{mb(lanesMini[i],660,220,70,l.color); for(let k=0;k<3;k++) svgEl('rect',{x:lanesMini[i]-95,y:720+k*52,width:190,height:38,rx:10,fill:l.color,opacity:.35},botSvg);});
+const miniDots = [0,1,2,3,4,5].map(i=>svgEl('circle',{r:9,fill:'#fff'},botSvg));
+const botTxt = mk('div','abs',pBot,`<div class="tag" style="background:#4F8CFF;color:#000">${esc(C.compare.after.tag)}</div>`); Object.assign(botTxt.style,{left:'0',right:'0',top:'60px',textAlign:'center'});
+const botBig = bigText(pBot, esc(C.compare.after.text), 200, 96);
+const arrow = mk('div','abs',Lcmp,'<svg width="130" height="130" viewBox="0 0 130 130"><circle cx="65" cy="65" r="62" fill="#fff"/><path d="M65 35 L65 92 M42 70 L65 93 L88 70" stroke="#000" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+Object.assign(arrow.style,{left:'475px',top:'895px'});
+CUES.whoosh.push({t:T.compare,d:0.2,k:'swish'},{t:T.compare+0.3,d:0.2,k:'swish'}); CUES.hits.push({t:T.compare+0.5,k:'soft'});
+function renderCmp(t){
+  const a=T.compare;
+  const p1=eExpo(P(t,a,a+0.25)), p2=eExpo(P(t,a+0.3,a+0.55));
+  pTop.style.transform=`translateY(${lerp(-960,0,p1)}px)`; pBot.style.transform=`translateY(${lerp(960,0,p2)}px)`;
+  const ap=eBack(P(t,a+0.5,a+0.7)); arrow.style.transform=`scale(${ap})`; arrow.style.opacity=clamp(ap);
+  setTx(topBig,{o:1}); setTx(botBig,{o:1});
+  miniLines.forEach((l,i)=>l.setAttribute('transform',`translate(${Math.sin(t*30+i)*6},${Math.cos(t*27+i)*6})`));
+  miniWins.forEach((r,i)=>r.setAttribute('transform',`translate(${Math.sin(t*25+i*3)*5},${Math.cos(t*22+i)*5})`));
+  miniDots.forEach((d,i)=>{const u=((t*1.3+i/6)%1); const lane=i%3; let x,y; if(u<0.4){x=540;y=lerp(260,460,u/0.4);} else {const v=(u-0.4)/0.6; x=lerp(540,lanesMini[lane],eInOut(v)); y=lerp(490,660,v);} d.setAttribute('cx',x); d.setAttribute('cy',y); d.setAttribute('fill',C.after.lanes[lane].color);});
+}
+
+/* =====================================================================
+   8) CORE MESSAGE
+   ===================================================================== */
+const Lcore = layer();
+const core1 = bigText(Lcore, esc(C.core.first), 900, 92, 960, '#d6d6d6');
+function hl(s){const h=C.core.highlight; return h&&s.includes(h)? esc(s).replace(esc(h),`<span style="color:${C.brand.accent};position:relative">${esc(h)}<i class="ul" style="position:absolute;left:0;right:0;bottom:-6px;height:12px;background:${C.brand.accent};border-radius:6px;transform-origin:left;display:block"></i></span>`) : esc(s);}
+const core2 = C.core.second.map((s,i)=>bigText(Lcore, hl(s), 1000+i*185, 168));
+const uls=[...Lcore.querySelectorAll('.ul')];
+CUES.silence.push([T.core+0.55, T.core2]); CUES.hits.push({t:T.core,k:'soft'},{t:T.core2,k:'impact'});
+function renderCore(t){
+  const p=eExpo(P(t,T.core,T.core+0.35)); const m=eInOut(P(t,T.core2,T.core2+0.3));
+  setTx(core1,{o:clamp(P(t,T.core,T.core+0.15))*lerp(1,0.45,m), y:lerp(40,0,p)+lerp(0,-240,m), s:lerp(1,0.8,m)});
+  core2.forEach((e,i)=>punch(e,t,T.core2+i*0.12,1e9,1.35));
+  uls.forEach(u=>u.style.transform=`scaleX(${eCubic(P(t,T.core2+0.3,T.core2+0.6))})`);
+}
+
+/* =====================================================================
+   9) CTA
+   ===================================================================== */
+const Lcta = layer();
+const ctaSvg = svgLayer(Lcta);
+const ctaLines=[...Array(24)].map((_,i)=>svgEl('path',{d:`M0,${80+i*80} L1080,${80+i*80}`,stroke:'#fff','stroke-width':1.5,opacity:.07},ctaSvg));
+const svc = mk('div','svc',Lcta,esc(C.cta.service)); svc.style.top='430px';
+const q = C.cta.question.map((s,i)=>bigText(Lcta, esc(s), 690+i*165, 140));
+const ring = mk('div','ring',Lcta); ring.style.top='1070px';
+const btn = mk('div','btn',Lcta,esc(C.cta.button)); btn.style.top='1070px';
+{ let s=56; btn.style.fontSize=s+'px'; while(btn.scrollWidth>840&&s>30){s-=2;btn.style.fontSize=s+'px';} }
+const brandBox = mk('div','abs',Lcta, `${C.brand.logo?`<img src="${C.brand.logo}" style="width:120px;height:120px;border-radius:30px;object-fit:contain">`:'<div class="logo-ph">LOGO</div>'}<div style="font-size:48px;font-weight:900;letter-spacing:-0.02em">${esc(C.brand.name)}</div>`);
+Object.assign(brandBox.style,{left:'0',right:'0',top:'1560px',display:'flex',alignItems:'center',justifyContent:'center',gap:'28px'});
+CUES.hits.push({t:T.cta,k:'soft'},{t:T.cta+0.25,k:'stab'},{t:T.cta+0.75,k:'impact2'});
+function renderCta(t){
+  const a=T.cta;
+  const p=eExpo(P(t,a,a+0.4)); svc.style.opacity=p; svc.style.transform=`translate(-50%,-50%) translateY(${lerp(40,0,p)}px)`;
+  q.forEach((e,i)=>punch(e,t,a+0.25+i*0.12,1e9,1.3));
+  const b=eBack(P(t,a+0.75,a+1.05)); btn.style.opacity=clamp(b); btn.style.transform=`translate(-50%,0) scale(${b*(1+0.02*Math.sin((t-a)*6)*P(t,a+1.2,a+1.5))})`;
+  const rp=((t-a-1.3)%1.2+1.2)%1.2/1.2; const on=t>a+1.3; ring.style.opacity=on?(1-rp)*0.6:0; ring.style.transform=`translate(-50%,0) scale(${1+rp*0.12},${1+rp*0.35})`;
+  const bp=eExpo(P(t,a+1.1,a+1.5)); brandBox.style.opacity=bp; brandBox.style.transform=`translateY(${lerp(30,0,bp)}px)`;
+  ctaLines.forEach((l,i)=>l.setAttribute('opacity',0.07*eCubic(P(t,a+i*0.02,a+0.4+i*0.02))));
+}
+
+/* =====================================================================
+   MASTER RENDER
+   ===================================================================== */
+const SCENES = [
+  [Lhook, T.hook, T.stop, renderHook],
+  [Lstop, T.stop, T.before, renderStop],
+  [Ldesk, T.before, T.turnMorph, (t)=>{ renderDesk(t, T.turn-0.001);
+      const fz=P(t,T.turn,T.turn+0.01); Ldesk.style.filter = t>=T.turn?'grayscale(1) brightness(.75)':''; Ldesk.style.transform=t>=T.turn?`scale(${1+0.03*P(t,T.turn,T.turnMorph)})`:''; }],
+  [Lturn, T.turnMorph, T.after, renderTurn],
+  [Lflow, T.after, T.result+0.2, renderFlow],
+  [Ldash, T.gather, T.compare, renderDash],
+  [Lcmp, T.compare, T.core, renderCmp],
+  [Lcore, T.core, T.cta, renderCore],
+  [Lcta, T.cta, T.end+1, renderCta],
+];
+function render(t){
+  Lflow.style.zIndex=5; Ldash.style.zIndex=4;
+  for(const [L,a,b,fn] of SCENES){ const on=t>=a&&t<b; L.style.display=on?'block':'none'; if(on) fn(t); }
+  // Turn 시작 시 선 레이어가 데스크톱에서 넘어오는 순간: 창 페이드
+  if(t>=T.turnMorph && t<T.turnMorph+0.3){ Ldesk.style.display='block'; renderDesk(T.turn-0.001, T.turn-0.001); Ldesk.style.filter='grayscale(1) brightness(.75)'; Ldesk.style.opacity=1-P(t,T.turnMorph,T.turnMorph+0.3); lineSvg.style.opacity=0; }
+  else { Ldesk.style.opacity=1; lineSvg.style.opacity=1; }
+  // 컷 전환 플래시 (구조 전환점)
+  flash.style.opacity = t>=T.turnText&&t<T.turnText+0.12 ? 0.35*(1-P(t,T.turnText,T.turnText+0.12)) : 0;
+}
+render(0);
+window.render = render; window.CUES = CUES; window.DURATION = C.duration || T.end;
+
+/* 미리보기: 브라우저에서 열면 자동 재생 (렌더링 시에는 ?render=1) */
+if(!location.search.includes('render')){
+  const fit=()=>{const s=Math.min(innerWidth/W, innerHeight/H); stage.style.transform=`scale(${s})`; document.body.style.height=innerHeight+'px';};
+  fit(); addEventListener('resize',fit);
+  const au = window.AUDIO_SRC ? new Audio(window.AUDIO_SRC) : null; let st=null;
+  const loop=(now)=>{ if(st==null) st=now; const t=((now-st)/1000)%window.DURATION; render(t); requestAnimationFrame(loop); };
+  document.addEventListener('click',()=>{ st=null; if(au){au.currentTime=0; au.play();} });
+  requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>

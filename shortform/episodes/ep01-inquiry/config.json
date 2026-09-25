@@ -1,0 +1,114 @@
+{
+  "_comment": "에피소드 설정 파일. 이 파일의 문구/데이터만 바꾸면 새 영상이 만들어집니다. 시간 단위는 초(s).",
+  "episode": "ep01-inquiry",
+  "title": "고객문의 편",
+  "fps": 30,
+  "duration": 25,
+  "bpm": 120,
+
+  "brand": {
+    "name": "브랜드명",
+    "logo": null,
+    "accent": "#4F8CFF"
+  },
+
+  "hook": {
+    "background": { "src": "assets/stock/pexels-12894337-mizuno-k.mp4", "start": 3.0, "dim": 0.38, "blur": 2, "saturation": 0.55 },
+    "lines": ["AI부터 붙이면", "업무가 빨라질까요?"],
+    "notifications": [
+      { "app": "kakao", "name": "카카오톡", "title": "김사장님", "body": "어제 주문한 거 언제 와요?" },
+      { "app": "mail", "name": "메일", "title": "[견적문의] 50개 단체주문", "body": "단가표 보내주실 수 있나요?" },
+      { "app": "excel", "name": "Excel", "title": "접수현황_최종_진짜최종.xlsx", "body": "3명이 동시에 편집 중" },
+      { "app": "inquiry", "name": "고객문의", "title": "새 문의 3건", "body": "환불 요청 · 배송 누락 · 옵션 변경" },
+      { "app": "kakao", "name": "카카오톡", "title": "박팀장", "body": "이거 누가 답변했어요??" },
+      { "app": "mail", "name": "메일", "title": "Re: Re: Re: 교환 건", "body": "아직 처리가 안 됐는데요" },
+      { "app": "memo", "name": "메모", "title": "사장님 확인 필요", "body": "환불 기준 다시 물어보기" },
+      { "app": "kakao", "name": "카카오톡", "title": "고객센터 단톡 (23)", "body": "사진 보냈어요 확인 부탁드려요" },
+      { "app": "inquiry", "name": "고객문의", "title": "새 문의 5건", "body": "주문번호 2381 외 4건" },
+      { "app": "excel", "name": "Excel", "title": "재고표.xlsx", "body": "#REF! 오류 12개" },
+      { "app": "mail", "name": "메일", "title": "[긴급] 배송지 변경", "body": "오늘 출고 전에 꼭 바꿔주세요" },
+      { "app": "kakao", "name": "카카오톡", "title": "이대리", "body": "그 고객 어제도 문의했었어요" },
+      { "app": "inquiry", "name": "고객문의", "title": "새 문의 8건", "body": "답변 대기 시간 3시간 초과" },
+      { "app": "memo", "name": "메모", "title": "TODO", "body": "엑셀에 옮겨 적기 (어제 거 포함)" }
+    ]
+  },
+
+  "stop": { "text": "아니요." },
+
+  "before": {
+    "counterLabel": "처리 대기 문의",
+    "counterFrom": 12,
+    "counterTo": 47,
+    "words": ["읽고", "찾고", "옮기고", "판단하고", "다시 확인하고"],
+    "windows": {
+      "chat": { "title": "고객센터 단톡", "bubbles": ["배송 언제 와요?", "옵션 잘못 골랐어요", "환불 되나요?", "사진 첨부했어요", "답변 부탁드려요"] },
+      "mail": { "title": "받은편지함", "rows": [["김OO", "교환 요청드립니다"], ["(주)한빛", "단체주문 견적 문의"], ["이OO", "배송지 변경 부탁"], ["박OO", "Re: 환불 건 확인"], ["최OO", "주문번호 2381 문의"], ["정OO", "제품 파손 사진"]], "search": "주문번호 2381" },
+      "sheet": { "title": "접수현황.xlsx", "cols": ["일자", "고객", "유형", "상태"] },
+      "memo": { "title": "처리 기준 메모", "lines": ["환불? 교환?", "→ 사장님께 확인", "파손은 사진 먼저", "단체주문은 누가?"] }
+    },
+    "chaosCaption": ["문제는 AI가", "없는 게 아니라"]
+  },
+
+  "turn": { "text": "일의 구조입니다." },
+
+  "after": {
+    "words": ["나누고.", "판단하고.", "필요한 곳에만 AI."],
+    "input": "고객 문의",
+    "classifier": "업무 분류",
+    "classifierSub": "유형 · 긴급도 · 규칙",
+    "lanes": [
+      { "key": "ai", "label": "AI · 자동화", "sub": "반복 · 규칙", "color": "#4F8CFF" },
+      { "key": "human", "label": "사람 판단", "sub": "판단 필요", "color": "#F5A524" },
+      { "key": "exception", "label": "예외 전달", "sub": "담당자에게", "color": "#FF5A5F" }
+    ],
+    "items": [
+      { "text": "배송 조회", "lane": "ai" },
+      { "text": "환불 요청", "lane": "human" },
+      { "text": "영업시간 문의", "lane": "ai" },
+      { "text": "제품 파손", "lane": "exception" },
+      { "text": "옵션 변경", "lane": "ai" },
+      { "text": "단체 견적", "lane": "human" },
+      { "text": "재입고 알림", "lane": "ai" },
+      { "text": "주소 변경", "lane": "ai" },
+      { "text": "클레임", "lane": "exception" },
+      { "text": "교환 가능?", "lane": "human" },
+      { "text": "송장 번호", "lane": "ai" },
+      { "text": "영수증 발급", "lane": "ai" }
+    ]
+  },
+
+  "result": {
+    "title": "오늘의 문의 현황",
+    "headline": "한눈에.",
+    "kpis": [
+      { "label": "자동 처리", "value": 32, "lane": "ai" },
+      { "label": "사람 판단", "value": 12, "lane": "human" },
+      { "label": "예외 전달", "value": 3, "lane": "exception" }
+    ],
+    "reviewTitle": "사람 판단 필요",
+    "reviews": [
+      { "who": "김", "text": "환불 요청 · 주문 2381", "status": "검토중", "lane": "human" },
+      { "who": "박", "text": "단체 견적 50개", "status": "대기", "lane": "human" },
+      { "who": "이", "text": "제품 파손 · 사진 확인", "status": "전달됨", "lane": "exception" }
+    ],
+    "pendingLabel": "미처리 문의",
+    "pendingValue": 0
+  },
+
+  "compare": {
+    "before": { "tag": "BEFORE", "text": "사람 머릿속 업무" },
+    "after": { "tag": "AFTER", "text": "누구나 따라가는 시스템" }
+  },
+
+  "core": {
+    "first": "AI를 추가하지 않습니다.",
+    "second": ["일하는 방식을", "다시 설계합니다."],
+    "highlight": "다시 설계"
+  },
+
+  "cta": {
+    "service": "업무 구조화 · AI 워크플로 설계",
+    "question": ["우리 업무도", "바꿀 수 있을까?"],
+    "button": "크몽에서 업무 진단받기 →"
+  }
+}

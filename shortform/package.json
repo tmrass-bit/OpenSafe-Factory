@@ -1,0 +1,15 @@
+{
+  "name": "shortform",
+  "version": "1.0.0",
+  "description": "25초 · 9:16 · 30fps 세로 광고를 **설정 파일(config.json) 하나로** 찍어내는 코드 템플릿입니다. 영상 편집 프로그램 없이, 글자·화면·음악이 모두 코드로 만들어집니다.",
+  "main": "render.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.56.1"
+  }
+}
