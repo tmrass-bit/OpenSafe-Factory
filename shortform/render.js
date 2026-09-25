@@ -4,7 +4,8 @@ const fs = require('fs'), path = require('path'), { spawn, execSync } = require(
 const epDir = path.resolve(process.argv[2] || 'episodes/ep01-inquiry');
 const cfg = JSON.parse(fs.readFileSync(path.join(epDir, 'config.json'), 'utf8'));
 const out = path.resolve('out', cfg.episode); fs.mkdirSync(out, { recursive: true });
-const tpl = path.resolve('engine/template.html');
+// config.template === "minimal" → EP01 엔진과 무관한 별도 template 사용 (engine/template.html 은 손대지 않음)
+const tpl = path.resolve(cfg.template === 'minimal' ? 'engine/template_minimal.html' : 'engine/template.html');
 const argFrames = process.argv.includes('--frames') ? process.argv[process.argv.indexOf('--frames') + 1].split(',').map(Number) : null;
 (async () => {
   const browser = await chromium.launch({ args: ['--font-render-hinting=none'] });

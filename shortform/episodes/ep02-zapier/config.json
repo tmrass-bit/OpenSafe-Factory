@@ -1,0 +1,47 @@
+{
+  "_comment": "Zapier 편. engine/template_minimal.html 전용 config — EP01 스키마(hook/turn.modules/after.lanes 등)와 다르다.",
+  "episode": "ep02-zapier",
+  "title": "Zapier — 업무가 끊기는 순간",
+  "template": "minimal",
+  "fps": 30,
+  "duration": 23,
+
+  "brand": { "name": "Zapier", "accent": "#FF4A00" },
+
+  "open": {
+    "text": "업무가 끊기는 순간.",
+    "background": { "color": "#0b0b0d", "dim": 0 }
+  },
+
+  "before": {
+    "words": ["받고", "옮기고", "붙이고", "알리고", "다시"],
+    "background": { "color": "#101012", "dim": 0 }
+  },
+
+  "turn": {
+    "lines": [
+      "업무가 끊기는 곳은, 앱과 앱 사이.",
+      "그 사이를, 사람이 메우고 있었습니다."
+    ]
+  },
+
+  "proof": {
+    "steps": ["Trigger", "Action", "Action"],
+    "note": "공식 Zapier 화면으로 교체 예정 (asset 미확정)"
+  },
+
+  "after": {
+    "words": ["받고", "잇고", "닿고", "다음"],
+    "background": { "color": "#0d1116", "dim": 0 }
+  },
+
+  "close": {
+    "lines": ["어느 순간에도,", "업무는 이어져야 하니까."]
+  },
+
+  "end": {
+    "wordmark": "Zapier"
+  },
+
+  "timeline": { "open": 0, "before": 1.8, "turn": 5.8, "proof": 8.6, "after": 12.0, "close": 16.4, "end": 20.6, "total": 23 }
+}

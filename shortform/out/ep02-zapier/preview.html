@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Shortform Engine — Minimal</title>
+<style>
+  /* Zapier 편 전용 최소 엔진의 스타일. engine/template.html(EP01)과 완전히 분리되어 있고
+     그쪽 CSS를 참조하지 않는다. 이 편에 실제 필요한 것만: 배경, 중앙 타이포, proof 박스. */
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { background:#000; overflow:hidden; }
+  body { font-family:'Noto Sans CJK KR','Noto Sans KR',sans-serif; color:#fff; -webkit-font-smoothing:antialiased; }
+  #stage { position:relative; width:1080px; height:1920px; overflow:hidden; background:#000; transform-origin:0 0; }
+  .layer { position:absolute; inset:0; display:none; }
+  .bgfill { position:absolute; inset:0; background-size:cover; background-position:center; transition:none; }
+  .bgimg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .dim { position:absolute; inset:0; background:#000; }
+  .ctxt { position:absolute; left:540px; top:960px; transform:translate(-50%,-50%); width:920px; text-align:center;
+          font-weight:900; letter-spacing:-0.03em; line-height:1.28; will-change:transform,opacity; }
+  .word { position:absolute; left:540px; top:960px; transform:translate(-50%,-50%); font-weight:900; font-size:108px;
+          letter-spacing:-0.03em; will-change:transform,opacity; }
+  .proof { position:absolute; left:90px; right:90px; top:720px; border:2px solid #FF4A00; border-radius:32px;
+           padding:64px 40px; background:rgba(255,74,0,.07); }
+  .proof .step { font-size:46px; font-weight:900; text-align:center; margin:20px 0; opacity:0; }
+  .proof .arrow { text-align:center; font-size:38px; color:#FF4A00; opacity:0; }
+  .proof .cap { position:absolute; left:0; right:0; bottom:-60px; text-align:center; font-size:24px; color:#888; }
+  .wordmark { position:absolute; left:540px; top:960px; transform:translate(-50%,-50%); font-size:100px; font-weight:900;
+              letter-spacing:-0.02em; opacity:0; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>window.CONFIG={"_comment":"Zapier 편. engine/template_minimal.html 전용 config — EP01 스키마(hook/turn.modules/after.lanes 등)와 다르다.","episode":"ep02-zapier","title":"Zapier — 업무가 끊기는 순간","template":"minimal","fps":30,"duration":23,"brand":{"name":"Zapier","accent":"#FF4A00"},"open":{"text":"업무가 끊기는 순간.","background":{"color":"#0b0b0d","dim":0}},"before":{"words":["받고","옮기고","붙이고","알리고","다시"],"background":{"color":"#101012","dim":0}},"turn":{"lines":["업무가 끊기는 곳은, 앱과 앱 사이.","그 사이를, 사람이 메우고 있었습니다."]},"proof":{"steps":["Trigger","Action","Action"],"note":"공식 Zapier 화면으로 교체 예정 (asset 미확정)"},"after":{"words":["받고","잇고","닿고","다음"],"background":{"color":"#0d1116","dim":0}},"close":{"lines":["어느 순간에도,","업무는 이어져야 하니까."]},"end":{"wordmark":"Zapier"},"timeline":{"open":0,"before":1.8,"turn":5.8,"proof":8.6,"after":12,"close":16.4,"end":20.6,"total":23}};window.BG={};window.AUDIO_SRC='music.wav';</script>
+<script>
+/* =====================================================================
+   ZAPIER 편 전용 최소 엔진. engine/template.html(EP01)과 코드 공유 없음 — 독립 파일.
+   이 편의 spine(OPEN→BEFORE→TURN→PROOF→AFTER→CLOSE→END)에 필요한 만큼만 구현한다.
+   Exploded View / 3D 모듈 / 3-lane / dashboard 없음.
+   ===================================================================== */
+const C = window.CONFIG;
+const W = 1080, H = 1920;
+// 박자 격자 대신 초 단위 타임라인을 그대로 쓴다 (이 편은 EP01만큼 음악 동기화가 촘촘하지 않음).
+// config.timeline 으로 개별 값(초 단위) 덮어쓰기 가능.
+const TB = { open:0, before:1.8, turn:5.8, proof:8.6, after:12.0, close:16.4, end:20.6, total:23 };
+const T = Object.assign({}, TB, C.timeline || {});
+
+const clamp = (x,a=0,b=1) => Math.min(b, Math.max(a,x));
+const P = (t,a,b) => clamp((t-a)/(b-a));
+const lerp = (a,b,x) => a + (b-a)*x;
+const eCubic = x => 1 - Math.pow(1-x, 3);
+const stage = document.getElementById('stage');
+function mk(tag, cls, parent, html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; (parent||stage).appendChild(e); return e; }
+function layer(){ return mk('div','layer'); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+/* ---------- 배경: 색이 기본, cfg.image 가 있으면 정지 이미지(예: proof 스크린샷, 로고).
+   영상 footage는 이번 라운드(animatic)에서는 다루지 않는다 — 프레임 단위 합성은
+   최종 제작 단계에서 render.js 의 기존 배경 추출 파이프라인을 이 template 전용으로
+   연결하는 별도 작업이며, 지금은 색 배경으로 구조/리듬만 검증한다. ---------- */
+function sceneBg(parent, cfg, fallback){
+  const fill = mk('div','bgfill', parent);
+  fill.style.background = (cfg && cfg.color) || fallback;
+  if (cfg && cfg.image){
+    const img = mk('img','bgimg', parent); img.src = cfg.image;
+  }
+  const dim = mk('div','dim', parent); dim.style.opacity = (cfg && cfg.dim != null) ? cfg.dim : 0;
+}
+
+/* ---------- 중앙 카피: OPEN / TURN / CLOSE 공용 ---------- */
+function centerLines(parent, lines, t, a, b, size){
+  const el = mk('div','ctxt', parent, lines.map(esc).join('<br>'));
+  el.style.fontSize = (size || 76) + 'px';
+  const inT = P(t, a, a+0.35), outT = 1 - P(t, b-0.35, b);
+  el.style.opacity = Math.min(inT, t < b ? 1 : outT);
+  el.style.transform = `translate(-50%,-50%) translateY(${lerp(24, 0, eCubic(inT))}px)`;
+}
+
+/* ---------- 한 단어 = 한 컷 = 한 박자 (BEFORE / AFTER 가 같은 문법을 공유) ---------- */
+function wordRhythm(parent, words, t, a, b){
+  const seg = (b - a) / words.length;
+  const i = clamp(Math.floor((t - a) / seg), 0, words.length - 1);
+  const localT = t - (a + i * seg);
+  const el = mk('div','word', parent, esc(words[i]));
+  const inO = P(localT, 0, 0.12), outO = 1 - P(localT, seg - 0.16, seg);
+  el.style.opacity = Math.min(inO, outO);
+  el.style.transform = `translate(-50%,-50%) scale(${lerp(0.94, 1, eCubic(inO))})`;
+}
+
+/* ---------- PROOF: Trigger → Action → Action 만 보여준다 (기능 나열 아님).
+   공식 Zapier 자산 확정 전까지는 자리표시 라벨 + 안내 캡션으로 대체. ---------- */
+function renderProof(parent, t){
+  const box = mk('div','proof', parent);
+  const steps = (C.proof && C.proof.steps) || ['Trigger', 'Action', 'Action'];
+  const stepDur = (T.after - T.proof - 0.6) / steps.length;
+  steps.forEach((s, i) => {
+    const st = T.proof + 0.3 + i * stepDur;
+    const stepEl = mk('div','step', box, esc(s));
+    stepEl.style.opacity = P(t, st, st + 0.25);
+    if (i < steps.length - 1){
+      const arEl = mk('div','arrow', box, '↓');
+      arEl.style.opacity = P(t, st + stepDur * 0.6, st + stepDur * 0.6 + 0.25);
+    }
+  });
+  mk('div','cap', box, esc((C.proof && C.proof.note) || '공식 Zapier 화면으로 교체 예정 (asset 미확정)'));
+}
+
+/* ---------- WORDMARK: 최종은 공식 로고 이미지, 확정 전까지 텍스트 자리표시 ---------- */
+function renderEnd(parent, t){
+  if (C.end && C.end.logo){
+    const img = mk('img', null, parent); img.src = C.end.logo;
+    Object.assign(img.style, { position:'absolute', left:'50%', top:'50%', transform:'translate(-50%,-50%)', maxWidth:'620px' });
+    img.style.opacity = P(t, T.end, T.end + 0.4);
+    return;
+  }
+  const el = mk('div','wordmark', parent, esc((C.end && C.end.wordmark) || C.brand.name));
+  el.style.color = (C.brand && C.brand.accent) || '#FF4A00';
+  el.style.opacity = P(t, T.end, T.end + 0.4);
+}
+
+/* ---------- 장면 레이어 ---------- */
+const Lopen = layer(), Lbefore = layer(), Lturn = layer(), Lproof = layer(),
+      Lafter = layer(), Lclose = layer(), Lend = layer();
+
+function renderOpen(t){
+  Lopen.innerHTML = '';
+  sceneBg(Lopen, C.open && C.open.background, '#0b0b0d');
+  centerLines(Lopen, [(C.open && C.open.text) || ''], t, T.open, T.before, 78);
+}
+function renderBefore(t){
+  Lbefore.innerHTML = '';
+  sceneBg(Lbefore, C.before && C.before.background, '#101012');
+  wordRhythm(Lbefore, (C.before && C.before.words) || [], t, T.before, T.turn);
+}
+function renderTurn(t){
+  Lturn.innerHTML = '';
+  // Freeze Frame: BEFORE 배경을 그대로 얼리고(정지) 흑백 처리, Silence Drop 은 사운드 단계에서 처리.
+  sceneBg(Lturn, C.before && C.before.background, '#101012');
+  Lturn.style.filter = 'grayscale(1) brightness(.72)';
+  const lines = (C.turn && C.turn.lines) || [];
+  const half = (T.proof - T.turn) / 2;
+  if (lines[0]) centerLines(Lturn, [lines[0]], t, T.turn, T.turn + half, 62);
+  if (lines[1]) centerLines(Lturn, [lines[1]], t, T.turn + half, T.proof, 62);
+}
+function renderProofScene(t){
+  Lproof.innerHTML = '';
+  sceneBg(Lproof, null, '#000');
+  renderProof(Lproof, t);
+}
+function renderAfter(t){
+  Lafter.innerHTML = '';
+  sceneBg(Lafter, C.after && C.after.background, '#0d1116');
+  wordRhythm(Lafter, (C.after && C.after.words) || [], t, T.after, T.close);
+}
+function renderClose(t){
+  Lclose.innerHTML = '';
+  // CLOSE: OPEN과 같은 구도(같은 배경 소스)로 되돌아가되 손이 빠진 프레임을 쓴다(footage 준비 시 반영).
+  sceneBg(Lclose, C.close && C.close.background || C.open && C.open.background, '#0b0b0d');
+  centerLines(Lclose, (C.close && C.close.lines) || [], t, T.close, T.end, 70);
+}
+function renderEndScene(t){
+  Lend.innerHTML = '';
+  renderEnd(Lend, t);
+}
+
+const SCENES = [
+  [Lopen,  T.open,  T.before, renderOpen],
+  [Lbefore, T.before, T.turn, renderBefore],
+  [Lturn,  T.turn,  T.proof, renderTurn],
+  [Lproof, T.proof, T.after, renderProofScene],
+  [Lafter, T.after, T.close, renderAfter],
+  [Lclose, T.close, T.end,   renderClose],
+  [Lend,   T.end,   T.total + 1, renderEndScene],
+];
+function render(t){
+  for (const [L, a, b, fn] of SCENES){ const on = t >= a && t < b; L.style.display = on ? 'block' : 'none'; if (on) fn(t); }
+}
+render(0);
+window.CUES = { T };
+window.ASSETS_READY = Promise.resolve();
+window.render = render;
+window.DURATION = C.duration || T.total;
+
+/* 미리보기: 브라우저에서 열면 자동 재생 (렌더링 시에는 ?render=1) */
+if (!location.search.includes('render')){
+  const fit = () => { const s = Math.min(innerWidth / W, innerHeight / H); stage.style.transform = `scale(${s})`; document.body.style.height = innerHeight + 'px'; };
+  fit(); addEventListener('resize', fit);
+  const au = window.AUDIO_SRC ? new Audio(window.AUDIO_SRC) : null; let st = null;
+  const loop = (now) => { if (st == null) st = now; const t = ((now - st) / 1000) % window.DURATION; render(t); requestAnimationFrame(loop); };
+  document.addEventListener('click', () => { st = null; if (au){ au.currentTime = 0; au.play(); } });
+  requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
