@@ -23,7 +23,8 @@ const argFrames = process.argv.includes('--frames') ? process.argv[process.argv.
     // 배경은 얕은 심도로 흐리게 쓰므로 절반 해상도로 추출해 용량을 줄임
     const vf = [`fps=${fps}`, 'scale=540:960:force_original_aspect_ratio=increase', 'crop=540:960',
       `eq=saturation=${bg.saturation ?? 0.6}`, bg.blur ? `gblur=sigma=${bg.blur / 2}` : null].filter(Boolean).join(',');
-    execSync(`ffmpeg -loglevel error -y -ss ${bg.start || 0} -i "${path.resolve(bg.src)}" -t ${len.toFixed(3)} -vf "${vf}" -q:v 4 "${path.join(dir, '%03d.jpg')}"`);
+    const isImg = /\.(jpe?g|png)$/i.test(bg.src);
+    execSync(`ffmpeg -loglevel error -y ${isImg ? '-loop 1' : `-ss ${bg.start || 0}`} -i "${path.resolve(bg.src)}" -t ${len.toFixed(3)} -vf "${vf}" -q:v 4 "${path.join(dir, '%03d.jpg')}"`);
     BG[key] = { count: fs.readdirSync(dir).filter(f => f.endsWith('.jpg')).length, fps, dim: bg.dim };
   }
   const bgFor = base => Object.fromEntries(Object.entries(BG).map(([k, v]) => [k, { ...v, base: base + 'bg_' + k + '/' }]));

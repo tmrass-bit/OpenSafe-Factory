@@ -70,7 +70,8 @@ async function withBackgrounds(page, T) {
     const stamp = hash(JSON.stringify([bg, len, vf])), stampFile = path.join(dir, '.stamp');
     if (!fs.existsSync(stampFile) || fs.readFileSync(stampFile, 'utf8') !== stamp) {
       fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
-      execSync(`ffmpeg -loglevel error -y -ss ${bg.start || 0} -i "${path.resolve(bg.src)}" -t ${len.toFixed(3)} -vf "${vf}" -q:v 4 "${path.join(dir, '%03d.jpg')}"`);
+      const isImg = /\.(jpe?g|png)$/i.test(bg.src);
+    execSync(`ffmpeg -loglevel error -y ${isImg ? '-loop 1' : `-ss ${bg.start || 0}`} -i "${path.resolve(bg.src)}" -t ${len.toFixed(3)} -vf "${vf}" -q:v 4 "${path.join(dir, '%03d.jpg')}"`);
       fs.writeFileSync(stampFile, stamp);
     }
     BG[key] = { count: fs.readdirSync(dir).filter(f => f.endsWith('.jpg')).length, fps, dim: bg.dim, base: 'file://' + dir + '/' };

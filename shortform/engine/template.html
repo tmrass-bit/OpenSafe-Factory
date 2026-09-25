@@ -676,11 +676,11 @@ const REV = C.result.reviews.slice(0,3);
 const lines = s => esc(s).split(' · ').join('<br>');
 const FRAG = [
   { w:250, h:200, html:r=>`<div style="padding:26px 24px;font-size:33px;font-weight:800;line-height:1.3;color:#3b2f00">${lines(r.text)}</div>`,
-    css:'background:#FFE066;border-radius:4px;box-shadow:0 14px 30px rgba(0,0,0,.45)', from:[330,480,-9], to:0.62 },
+    css:'background:#FFE066;border-radius:4px;box-shadow:0 14px 30px rgba(0,0,0,.45)', from:[170,150,-8], to:0.62 },
   { w:400, h:124, html:r=>`<div style="display:flex;gap:16px;align-items:center;padding:18px 20px"><div class="ic ic-kakao" style="width:72px;height:72px;border-radius:18px;font-size:22px;flex:none">TALK</div><div style="min-width:0"><div style="font-size:21px;color:#6b6b70">${esc(C.hook.notifications[0].name)} · 지금</div><div style="font-size:31px;font-weight:800;color:#111;white-space:nowrap">${esc(r.text)}</div></div></div>`,
-    css:'background:rgba(255,255,255,.97);border-radius:26px;box-shadow:0 14px 30px rgba(0,0,0,.45)', from:[700,640,6], to:0.5 },
+    css:'background:rgba(255,255,255,.97);border-radius:26px;box-shadow:0 14px 30px rgba(0,0,0,.45)', from:[760,140,5], to:0.5 },
   { w:260, h:190, html:r=>`<i style="position:absolute;left:85px;top:-14px;width:90px;height:30px;background:rgba(220,220,200,.8);transform:rotate(-4deg)"></i><div style="padding:30px 24px;font-size:31px;font-weight:700;line-height:1.35;color:#2b2b2b">${lines(r.text)}</div>`,
-    css:'background:#f6f3ea;border-radius:3px;box-shadow:0 14px 30px rgba(0,0,0,.45)', from:[290,930,5], to:0.62 },
+    css:'background:#f6f3ea;border-radius:3px;box-shadow:0 14px 30px rgba(0,0,0,.45)', from:[250,1320,4], to:0.62 },
 ].map((f,i)=>{ const r=REV[i], e=mk('div','abs',Lcmp,f.html(r)); e.style.cssText+=`;left:0;top:0;width:${f.w}px;height:${f.h}px;${f.css};transform-origin:50% 50%`;
   const tx=BD.x+26+f.w*f.to/2, ty=BD.y+46+ROW*i+ROW/2;
   const col=LANE_COLOR[r.lane]||'#888', step={'대기':1,'검토중':2,'전달됨':3}[r.status]||2;
@@ -701,13 +701,13 @@ function renderCmp(t){
   [cmpBgB.cv,cmpBgB.shade].forEach(e=>e&&(e.style.display=on2?'none':'block'));
   [cmpBgA.cv,cmpBgA.shade].forEach(e=>e&&(e.style.display=on2?'block':'none'));
   if(on2) cmpBgA.draw(t-T.cmpAfter, 1.03); else cmpBgB.draw(t-a, 1.03+0.015*P(t,a,T.cmpAfter));
-  cmpTint.style.background = on2 ? 'rgba(20,70,160,.12)' : 'rgba(120,10,15,.16)';
+  cmpTint.style.background = on2 ? 'rgba(20,70,160,.12)' : 'rgba(120,10,15,.08)';
   cmpLbl[0].style.opacity = on2?0:1; cmpLbl[1].style.opacity = on2?1:0;
   board.style.opacity = on2?1:0;
-  // BEFORE: 조각이 8분의 1박 간격으로 사람에게 달라붙음 → AFTER: 컷과 함께 보드 자리로 스냅
+  // BEFORE: 포즈가 먼저 읽히도록 1/4박 뒤부터, 조각이 8분의 1박 간격으로 머리·손을 피해 주변에 붙음 → AFTER: 컷과 함께 보드 자리로 스냅
   const mv = eExpo(P(t, T.cmpAfter, T.cmpAfter+0.2));
   FRAG.forEach((g,i)=>{
-    const [fx,fy,fr]=g.f.from, pin=eExpo(P(t, a+i*B/8, a+i*B/8+0.12));
+    const [fx,fy,fr]=g.f.from, pin=eExpo(P(t, a+B/4+i*B/8, a+B/4+i*B/8+0.1));
     const x=lerp(fx,g.tx,mv), y=lerp(fy,g.ty,mv), r=lerp(fr,0,mv), s=lerp(lerp(1.15,1,pin),g.f.to,mv);
     g.e.style.opacity=on2?1:pin; g.e.style.zIndex=on2?5:3;
     g.e.style.transform=`translate(${x-g.f.w/2}px,${y-g.f.h/2}px) rotate(${r}deg) scale(${s})`;
