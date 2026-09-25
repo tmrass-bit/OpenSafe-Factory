@@ -11,6 +11,7 @@ if (cfg.template === 'minimal') {
   const abs = p => p ? 'file://' + path.resolve(p) : p;
   if (cfg.proof && cfg.proof.image) cfg.proof.image = abs(cfg.proof.image);
   if (cfg.end && cfg.end.logo) cfg.end.logo = abs(cfg.end.logo);
+  if (cfg.before && Array.isArray(cfg.before.items)) cfg.before.items.forEach(it => { if (it.image) it.image = abs(it.image); });
 }
 const argFrames = process.argv.includes('--frames') ? process.argv[process.argv.indexOf('--frames') + 1].split(',').map(Number) : null;
 (async () => {

@@ -1,0 +1,30 @@
+{
+  "_comment": "Zapier V2. V1(episodes/ep02-zapier)은 실패 시안으로 동결 — 이 config는 별도 산출물(out/ep02-zapier-v2)을 만든다.",
+  "episode": "ep02-zapier-v2",
+  "title": "Zapier V2 — 정지사진 + 타이포 모션",
+  "template": "minimal",
+  "fps": 30,
+  "duration": 15,
+
+  "brand": { "name": "Zapier", "accent": "#FF4A00" },
+
+  "open": { "text": "업무가 끊기는 순간.", "highlight": "끊기는" },
+
+  "before": {
+    "items": [
+      { "word": "받고",   "image": "assets/stock/pexels-12899096-mizuno-k.jpg",      "effect": "riseIn" },
+      { "word": "옮기고", "image": "assets/stock/pexels-7654588-folders.jpg",         "effect": "slideSnap" },
+      { "word": "붙이고", "image": "assets/stock/pexels-12911208-sticky-note.jpg",    "effect": "firstCharPop" },
+      { "word": "알리고", "image": "assets/stock/pexels-32959143-notifications.jpg",  "effect": "revealSweep" },
+      { "word": "다시",   "image": "assets/stock/pexels-8424576-passing-paper.jpg",   "effect": "scaleUp" }
+    ]
+  },
+
+  "turn": { "lines": ["업무가 끊기는 곳은,", "앱과 앱 사이."] },
+
+  "proof": { "image": "assets/official/proof-trigger-action-action.png" },
+
+  "close": { "lines": ["어느 순간에도,", "업무는 이어져야 하니까."] },
+
+  "end": { "wordmark": "Zapier", "logo": "assets/official/zapier-logo-frost.svg" }
+}
