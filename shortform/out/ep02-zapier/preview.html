@@ -29,7 +29,7 @@
 </head>
 <body>
 <div id="stage"></div>
-<script>window.CONFIG={"_comment":"Zapier 편. engine/template_minimal.html 전용 config — EP01 스키마(hook/turn.modules/after.lanes 등)와 다르다.","episode":"ep02-zapier","title":"Zapier — 업무가 끊기는 순간","template":"minimal","fps":30,"duration":23,"brand":{"name":"Zapier","accent":"#FF4A00"},"open":{"text":"업무가 끊기는 순간.","background":{"color":"#0b0b0d","dim":0}},"before":{"words":["받고","옮기고","붙이고","알리고","다시"],"background":{"src":"assets/stock/pexels-7429487-cottonbro.mp4","start":13,"dim":0.42,"blur":1,"saturation":0.55}},"turn":{"lines":["업무가 끊기는 곳은, 앱과 앱 사이.","그 사이를, 사람이 메우고 있었습니다."]},"proof":{"image":"file:///home/user/OpenSafe-Factory/shortform/assets/official/proof-trigger-action-action.png","steps":["Trigger","Action","Action"]},"after":{"words":["받고","잇고","닿고","다음"],"background":{"color":"#0d1116","dim":0}},"close":{"lines":["어느 순간에도,","업무는 이어져야 하니까."],"background":{"src":"assets/stock/pexels-6632967-cup-of-couple.mp4","start":2.6,"dim":0.28,"blur":1,"saturation":0.6}},"end":{"wordmark":"Zapier","logo":"file:///home/user/OpenSafe-Factory/shortform/assets/official/zapier-logo-frost.svg"},"timeline":{"open":0,"before":1.8,"turn":5.8,"proof":8.6,"after":12,"close":16.4,"end":20.6,"total":23}};window.BG={"before":{"count":126,"fps":30,"dim":0.42,"base":"bg_before/"},"close":{"count":12,"fps":30,"dim":0.28,"base":"bg_close/"}};window.AUDIO_SRC='music.wav';</script>
+<script>window.CONFIG={"_comment":"Zapier 편. engine/template_minimal.html 전용 config — EP01 스키마(hook/turn.modules/after.lanes 등)와 다르다.","episode":"ep02-zapier","title":"Zapier — 업무가 끊기는 순간","template":"minimal","fps":30,"duration":23,"brand":{"name":"Zapier","accent":"#FF4A00"},"open":{"text":"업무가 끊기는 순간.","background":{"color":"#0b0b0d","dim":0}},"before":{"words":["받고","옮기고","붙이고","알리고","다시"],"background":{"src":"assets/stock/pexels-7429487-cottonbro.mp4","start":13,"dim":0.42,"blur":1,"saturation":0.55}},"turn":{"lines":["업무가 끊기는 곳은, 앱과 앱 사이.","그 사이를, 사람이 메우고 있었습니다."]},"proof":{"image":"file:///home/user/OpenSafe-Factory/shortform/assets/official/proof-trigger-action-action.png","steps":["Trigger","Action","Action"]},"after":{"words":["받고","잇고","닿고","다음"],"_comment":"새 footage/이미지 없음 — proof.image(공식 Zapier screenshot)를 그대로 재사용해 crop만 이동"},"close":{"lines":["어느 순간에도,","업무는 이어져야 하니까."],"background":{"src":"assets/stock/pexels-6632967-cup-of-couple.mp4","start":2.6,"dim":0.28,"blur":1,"saturation":0.6}},"end":{"wordmark":"Zapier","logo":"file:///home/user/OpenSafe-Factory/shortform/assets/official/zapier-logo-frost.svg"},"timeline":{"open":0,"before":1.8,"turn":5.8,"proof":8.6,"after":12,"close":16.4,"end":20.6,"total":23}};window.BG={"before":{"count":126,"fps":30,"dim":0.42,"base":"bg_before/"},"close":{"count":12,"fps":30,"dim":0.28,"base":"bg_close/"}};window.AUDIO_SRC='music.wav';</script>
 <script>
 /* =====================================================================
    ZAPIER 편 전용 최소 엔진. engine/template.html(EP01)과 코드 공유 없음 — 독립 파일.
@@ -158,16 +158,37 @@ const Lopen = layer(), Lbefore = layer(), Lturn = layer(), Lproof = layer(),
       Lafter = layer(), Lclose = layer(), Lend = layer();
 
 const bgBefore = bgFootage(Lbefore, 'before', '#101012');
-const bgAfter = bgFootage(Lafter, 'after', '#0d1116');
 const bgClose = bgFootage(Lclose, 'close', '#0b0b0d');
 const FgBefore = mk('div', null, Lbefore);
-const FgAfter = mk('div', null, Lafter);
 const FgClose = mk('div', null, Lclose);
-// TURN: BEFORE footage의 마지막 프레임을 그대로 얼려 쓴다 (Freeze Frame). footage가 없으면 색 배경 fallback.
+
+/* ---------- AFTER: 새 footage 없이 PROOF의 공식 Zapier screenshot을 그대로 재사용,
+   crop만 단계별로 이동한다 (같은 이미지 = proof이자 AFTER의 visual). 새 UI/애니메이션 없음.
+   PROOF와 같은 박스(같은 화면)를 그대로 다시 쓰고, 그 안에서만 확대해 카메라가 훑듯 이동한다
+   — 박스보다 훨씬 크게 확대하면(꽉 채우려면) 원본 해상도(520x340)가 심하게 깨지므로 zoom은 절제. ---------- */
+mk('div','bgfill', Lafter).style.background = '#0d1116';
+const AFTER_BOX_W = 860, AFTER_BOX_H = Math.round(860 * 340 / 520); // proof 박스와 같은 크기·비율
+const afterView = mk('div', null, Lafter);
+Object.assign(afterView.style, {
+  position:'absolute', left:'50%', top:'50%', transform:'translate(-50%,-50%)',
+  width:AFTER_BOX_W+'px', height:AFTER_BOX_H+'px', overflow:'hidden', borderRadius:'28px',
+  border:'2px solid #FF4A00', boxShadow:'0 30px 80px rgba(0,0,0,.6)'
+});
+const afterImg = mk('img', null, afterView);
+if (C.proof && C.proof.image) afterImg.src = C.proof.image;
+bgImgsAll.push(afterImg); // ASSETS_READY가 이 이미지도 기다리게(디코드 완료 후 스틸 캡처)
+Object.assign(afterImg.style, { position:'absolute', left:'50%', top:'0px' });
+const FgAfter = mk('div', null, Lafter);
+const AFTER_ASPECT = 340 / 520; // 원본 crop 세로/가로 비율(고정 asset이므로 하드코딩)
+// 원본 크롭(520x340) 안에서 각 단계의 세로 위치(0~1) — 받고=Forms, 잇고=Sheets, 닿고=Gmail, 다음=그 아래 "+"
+const AFTER_FOCUS = [0.132, 0.45, 0.76, 0.926];
+const AFTER_ZOOM = 1.9; // 박스 안에서만 확대 — 화면 전체를 채우지 않음(해상도 보호)
+// TURN: BEFORE footage의 마지막 프레임을 그대로 얼려 쓴다 (Freeze Frame). footage가 없으면 색 배경 fallback이
+// 먼저 깔리고(뒤), 그 위에 캔버스가 얼린 프레임을 그린다(앞) — 순서가 바뀌면 fallback 색이 캔버스를 덮어버린다.
+mk('div','bgfill', Lturn).style.background = '#101012';
 const turnCv = mk('canvas', null, Lturn); turnCv.width = W; turnCv.height = H;
 Object.assign(turnCv.style, { position:'absolute', inset:0, width:'100%', height:'100%' });
 const turnCtx = turnCv.getContext('2d');
-mk('div','bgfill', Lturn).style.background = '#101012';
 const FgTurn = mk('div', null, Lturn);
 Lturn.style.filter = 'grayscale(1) brightness(.72)';
 
@@ -197,9 +218,26 @@ function renderProofScene(t){
   renderProof(Lproof, t);
 }
 function renderAfter(t){
-  bgAfter.draw(t - T.after);
+  const words = (C.after && C.after.words) || [];
+  const seg = (T.close - T.after) / words.length;
+  const i = clamp(Math.floor((t - T.after) / seg), 0, words.length - 1);
+  const localT = t - (T.after + i * seg);
+  // 단계 사이는 simple push(약한 pan)로만 이동 — 새 애니메이션 시스템 없음, 기존 eCubic만 재사용
+  const prevY = AFTER_FOCUS[Math.max(0, i - 1)], curY = AFTER_FOCUS[i];
+  const panT = eCubic(P(localT, 0, 0.35));
+  const yFrac = lerp(i === 0 ? curY : prevY, curY, panT);
+  const zoom = AFTER_ZOOM * lerp(1, 1.04, eCubic(P(localT, 0, 0.12))); // 아주 약한 step emphasis
+  const imgW = AFTER_BOX_W * zoom, imgH = imgW * AFTER_ASPECT;
+  afterImg.style.width = imgW + 'px';
+  // 박스(overflow:hidden) 안에서 yFrac 지점이 박스 세로 중앙에 오도록만 이동 (가로는 항상 중앙 정렬)
+  const offsetY = AFTER_BOX_H / 2 - yFrac * imgH;
+  afterImg.style.transform = `translateX(-50%) translateY(${offsetY}px)`;
   FgAfter.innerHTML = '';
-  wordRhythm(FgAfter, (C.after && C.after.words) || [], t, T.after, T.close);
+  wordRhythm(FgAfter, words, t, T.after, T.close);
+  // 배경이 밝은 공식 UI 스크린샷이라 흰 글자가 묻힌다 — 같은 폰트/위치/타이밍은 그대로 두고
+  // 대비를 위한 어두운 그림자만 추가(새 타이포 시스템 아님, 읽히기 위한 최소 보정).
+  const wEl = FgAfter.querySelector('.word');
+  if (wEl) wEl.style.textShadow = '0 0 28px rgba(0,0,0,.85), 0 0 60px rgba(0,0,0,.7), 0 4px 10px rgba(0,0,0,.9)';
 }
 function renderClose(t){
   // CLOSE: 같은 구도(OPEN과 같은 촬영)에서 손이 빠진 프레임만 짧게 뽑아 정지시켜 쓴다.

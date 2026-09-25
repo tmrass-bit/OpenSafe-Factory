@@ -32,7 +32,7 @@
 
   "after": {
     "words": ["받고", "잇고", "닿고", "다음"],
-    "background": { "color": "#0d1116", "dim": 0 }
+    "_comment": "새 footage/이미지 없음 — proof.image(공식 Zapier screenshot)를 그대로 재사용해 crop만 이동"
   },
 
   "close": {
