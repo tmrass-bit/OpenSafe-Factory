@@ -39,4 +39,6 @@ final mp4 는 복사하지 않고 경로와 hash 로만 연결한다.
 
 ## 비교 기준
 - `cues.json` · `music.wav`: hash 일치 (결정적)
-- 키프레임 PNG: PSNR ≥ 40 dB (Chromium 래스터화가 실행마다 미세하게 달라 sha256 은 기록용)
+- 키프레임 PNG: **PROVISIONAL / CALIBRATION REQUIRED** — 통과 기준 미확정. sha256 은 기록용
+  - 측정 사실: 동일 storyboard 재렌더에서 Chromium 래스터화 차이로 일부 프레임 hash 가 달라짐. 측정한 1 사례 ≈ 45 dB PSNR
+  - 확정 방법: 동일 렌더의 자연 변동과 의미 있는 작은 visual change 를 모두 측정한 뒤 threshold 결정

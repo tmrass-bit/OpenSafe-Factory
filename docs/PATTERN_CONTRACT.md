@@ -67,7 +67,7 @@ episode config 는 장면별로 pattern 을 **버전까지 고정**해 참조한
 - `used_by` 에 LOCKED episode 가 하나라도 있으면 그 버전 디렉터리는 **읽기 전용**. 개선은 `V2/` 새 디렉터리.
 - 버그 수정도 예외 없음 — LOCKED 결과가 바뀌면 안 되므로 `V1` 은 그대로, 수정본은 `V2`.
 - 공통 `core`/`layout` 변경은 SYSTEM CHANGE. 변경 전 해당 모듈에 의존하는 LOCKED pattern 목록을 보고.
-- 검증: LOCKED episode 의 storyboard 키프레임이 Golden 과 같아야 한다 (`golden/README.md`). 판정은 sha256 일치가 아니라 PSNR 임계값(예: ≥ 40 dB) — Chromium 렌더는 실행마다 미세하게 달라질 수 있다 (PHASE 1 측정: 12장 중 0~5장 hash 불일치, 불일치 프레임 PSNR ≈ 45 dB).
+- 검증: LOCKED episode 의 storyboard 키프레임이 Golden 과 같아야 한다 (`golden/README.md`). 키프레임은 Chromium 렌더가 실행마다 미세하게 달라 sha256 일치로 판정할 수 없다 (PHASE 1: 일부 프레임 hash 불일치, 측정 1 사례 ≈ 45 dB PSNR). PSNR 등 threshold 는 **PROVISIONAL / CALIBRATION REQUIRED** — 자연 변동과 작은 visual change 를 측정한 뒤 확정. cues · audio 는 결정적이므로 hash 비교.
 - 더 쓰지 않을 버전은 `status: DEPRECATED` — 삭제하지 않고 새 episode 에서 선택 불가.
 
 ## 4. Dependency metadata → 자동 영향 분석 (interface 제안)
@@ -97,5 +97,5 @@ node validate.js impact <변경 대상>
 
 ## 5. 제안하는 다음 PHASE 순서
 1. PHASE 2: config 에 `scenes[]`(id · pattern · timing 앵커 · status) 추가. template 은 그대로 두고 schema 만 확장 → EP01 결과 동일성은 cues.json · music.wav hash 로 검증 (둘은 결정적: PHASE 1 에서 기준 결과물과 byte 일치 확인).
-2. PHASE 3: pattern 1개(가장 독립적인 `CTA_CALM`)만 먼저 분리해 contract 검증 → 이후 순차 분리. 각 분리 후 EP01 storyboard 가 Golden 과 PSNR 임계값 이상인지 확인.
+2. PHASE 3: pattern 1개(가장 독립적인 `CTA_CALM`)만 먼저 분리해 contract 검증 → 이후 순차 분리. 각 분리 후 EP01 cues · music hash 불변 + storyboard 가 Golden 과 비교 기준(calibration 후 확정) 이내인지 확인.
 3. `validate.js impact` 는 pattern.json 이 2개 이상 생긴 뒤 구현.
