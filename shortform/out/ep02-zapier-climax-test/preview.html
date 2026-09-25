@@ -151,7 +151,6 @@ function renderClimax(t){
   Lclimax.innerHTML = '';
   const box = mk('div','climaxBox', Lclimax);
   const img = mk('img','climaxImg', box); if (C.proof && C.proof.image) img.src = C.proof.image;
-  const capLayer = mk('div', null, Lclimax);
 
   if (t < T.a1) { // 5.4–6.0: 진입, orange accent 강조, 텍스트 없음
     const p = eCubic(P(t, T.proofIn, T.proofIn + 0.25));
@@ -191,6 +190,7 @@ function renderClimax(t){
     const vig = mk('div', null, Lclimax);
     Object.assign(vig.style, { position:'absolute', inset:0, background:'radial-gradient(ellipse at center, rgba(0,0,0,0) 42%, rgba(0,0,0,.62) 100%)' });
     const grain = mk('div','grain', Lclimax);
+    const capLayer = mk('div', null, Lclimax); // 사진/wash/vignette/grain보다 나중에 붙여야 타이포가 위로 그려진다
 
     const wEl = mk('div','word', capLayer, esc(photo.word));
     wEl.style.fontSize = (key === 'daeum' ? 168 : 140) + 'px'; // 다음은 앞 3컷보다 약간 크게
