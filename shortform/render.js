@@ -6,6 +6,12 @@ const cfg = JSON.parse(fs.readFileSync(path.join(epDir, 'config.json'), 'utf8'))
 const out = path.resolve('out', cfg.episode); fs.mkdirSync(out, { recursive: true });
 // config.template === "minimal" → EP01 엔진과 무관한 별도 template 사용 (engine/template.html 은 손대지 않음)
 const tpl = path.resolve(cfg.template === 'minimal' ? 'engine/template_minimal.html' : 'engine/template.html');
+// minimal template의 정적 asset(proof 스크린샷·로고)은 상대경로로 두면 file:// 컨텍스트에서 못 찾으므로 절대경로로 치환
+if (cfg.template === 'minimal') {
+  const abs = p => p ? 'file://' + path.resolve(p) : p;
+  if (cfg.proof && cfg.proof.image) cfg.proof.image = abs(cfg.proof.image);
+  if (cfg.end && cfg.end.logo) cfg.end.logo = abs(cfg.end.logo);
+}
 const argFrames = process.argv.includes('--frames') ? process.argv[process.argv.indexOf('--frames') + 1].split(',').map(Number) : null;
 (async () => {
   const browser = await chromium.launch({ args: ['--font-render-hinting=none'] });

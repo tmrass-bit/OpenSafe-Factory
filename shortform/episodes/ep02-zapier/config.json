@@ -26,8 +26,8 @@
   },
 
   "proof": {
-    "steps": ["Trigger", "Action", "Action"],
-    "note": "공식 Zapier 화면으로 교체 예정 (asset 미확정)"
+    "image": "assets/official/proof-trigger-action-action.png",
+    "steps": ["Trigger", "Action", "Action"]
   },
 
   "after": {
@@ -40,7 +40,8 @@
   },
 
   "end": {
-    "wordmark": "Zapier"
+    "wordmark": "Zapier",
+    "logo": "assets/official/zapier-logo-frost.svg"
   },
 
   "timeline": { "open": 0, "before": 1.8, "turn": 5.8, "proof": 8.6, "after": 12.0, "close": 16.4, "end": 20.6, "total": 23 }

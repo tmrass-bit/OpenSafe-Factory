@@ -87,6 +87,21 @@ function wordRhythm(parent, words, t, a, b){
 /* ---------- PROOF: Trigger → Action → Action 만 보여준다 (기능 나열 아님).
    공식 Zapier 자산 확정 전까지는 자리표시 라벨 + 안내 캡션으로 대체. ---------- */
 function renderProof(parent, t){
+  // 공식 Zapier screenshot이 있으면 그것만 보여준다 (Trigger → Action → Action 이 실제로 보이는 크롭본).
+  if (C.proof && C.proof.image){
+    const wrap = mk('div', null, parent);
+    Object.assign(wrap.style, {
+      position:'absolute', left:'50%', top:'50%', transform:'translate(-50%,-50%)',
+      width:'860px', borderRadius:'28px', overflow:'hidden', border:'2px solid #FF4A00',
+      boxShadow:'0 30px 80px rgba(0,0,0,.6)'
+    });
+    const img = mk('img', null, wrap); img.src = C.proof.image;
+    Object.assign(img.style, { width:'100%', display:'block' });
+    wrap.style.opacity = P(t, T.proof + 0.2, T.proof + 0.55);
+    wrap.style.transform = `translate(-50%,-50%) scale(${lerp(0.96, 1, eCubic(P(t, T.proof + 0.2, T.proof + 0.55)))})`;
+    return;
+  }
+  // 공식 asset 미확정 시 자리표시 (교체 전까지만 사용)
   const box = mk('div','proof', parent);
   const steps = (C.proof && C.proof.steps) || ['Trigger', 'Action', 'Action'];
   const stepDur = (T.after - T.proof - 0.6) / steps.length;

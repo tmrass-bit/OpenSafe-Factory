@@ -29,7 +29,7 @@
 </head>
 <body>
 <div id="stage"></div>
-<script>window.CONFIG={"_comment":"Zapier 편. engine/template_minimal.html 전용 config — EP01 스키마(hook/turn.modules/after.lanes 등)와 다르다.","episode":"ep02-zapier","title":"Zapier — 업무가 끊기는 순간","template":"minimal","fps":30,"duration":23,"brand":{"name":"Zapier","accent":"#FF4A00"},"open":{"text":"업무가 끊기는 순간.","background":{"color":"#0b0b0d","dim":0}},"before":{"words":["받고","옮기고","붙이고","알리고","다시"],"background":{"color":"#101012","dim":0}},"turn":{"lines":["업무가 끊기는 곳은, 앱과 앱 사이.","그 사이를, 사람이 메우고 있었습니다."]},"proof":{"steps":["Trigger","Action","Action"],"note":"공식 Zapier 화면으로 교체 예정 (asset 미확정)"},"after":{"words":["받고","잇고","닿고","다음"],"background":{"color":"#0d1116","dim":0}},"close":{"lines":["어느 순간에도,","업무는 이어져야 하니까."]},"end":{"wordmark":"Zapier"},"timeline":{"open":0,"before":1.8,"turn":5.8,"proof":8.6,"after":12,"close":16.4,"end":20.6,"total":23}};window.BG={};window.AUDIO_SRC='music.wav';</script>
+<script>window.CONFIG={"_comment":"Zapier 편. engine/template_minimal.html 전용 config — EP01 스키마(hook/turn.modules/after.lanes 등)와 다르다.","episode":"ep02-zapier","title":"Zapier — 업무가 끊기는 순간","template":"minimal","fps":30,"duration":23,"brand":{"name":"Zapier","accent":"#FF4A00"},"open":{"text":"업무가 끊기는 순간.","background":{"color":"#0b0b0d","dim":0}},"before":{"words":["받고","옮기고","붙이고","알리고","다시"],"background":{"color":"#101012","dim":0}},"turn":{"lines":["업무가 끊기는 곳은, 앱과 앱 사이.","그 사이를, 사람이 메우고 있었습니다."]},"proof":{"image":"file:///home/user/OpenSafe-Factory/shortform/assets/official/proof-trigger-action-action.png","steps":["Trigger","Action","Action"]},"after":{"words":["받고","잇고","닿고","다음"],"background":{"color":"#0d1116","dim":0}},"close":{"lines":["어느 순간에도,","업무는 이어져야 하니까."]},"end":{"wordmark":"Zapier","logo":"file:///home/user/OpenSafe-Factory/shortform/assets/official/zapier-logo-frost.svg"},"timeline":{"open":0,"before":1.8,"turn":5.8,"proof":8.6,"after":12,"close":16.4,"end":20.6,"total":23}};window.BG={};window.AUDIO_SRC='music.wav';</script>
 <script>
 /* =====================================================================
    ZAPIER 편 전용 최소 엔진. engine/template.html(EP01)과 코드 공유 없음 — 독립 파일.
@@ -88,6 +88,21 @@ function wordRhythm(parent, words, t, a, b){
 /* ---------- PROOF: Trigger → Action → Action 만 보여준다 (기능 나열 아님).
    공식 Zapier 자산 확정 전까지는 자리표시 라벨 + 안내 캡션으로 대체. ---------- */
 function renderProof(parent, t){
+  // 공식 Zapier screenshot이 있으면 그것만 보여준다 (Trigger → Action → Action 이 실제로 보이는 크롭본).
+  if (C.proof && C.proof.image){
+    const wrap = mk('div', null, parent);
+    Object.assign(wrap.style, {
+      position:'absolute', left:'50%', top:'50%', transform:'translate(-50%,-50%)',
+      width:'860px', borderRadius:'28px', overflow:'hidden', border:'2px solid #FF4A00',
+      boxShadow:'0 30px 80px rgba(0,0,0,.6)'
+    });
+    const img = mk('img', null, wrap); img.src = C.proof.image;
+    Object.assign(img.style, { width:'100%', display:'block' });
+    wrap.style.opacity = P(t, T.proof + 0.2, T.proof + 0.55);
+    wrap.style.transform = `translate(-50%,-50%) scale(${lerp(0.96, 1, eCubic(P(t, T.proof + 0.2, T.proof + 0.55)))})`;
+    return;
+  }
+  // 공식 asset 미확정 시 자리표시 (교체 전까지만 사용)
   const box = mk('div','proof', parent);
   const steps = (C.proof && C.proof.steps) || ['Trigger', 'Action', 'Action'];
   const stepDur = (T.after - T.proof - 0.6) / steps.length;

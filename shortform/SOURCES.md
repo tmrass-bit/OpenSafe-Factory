@@ -20,3 +20,12 @@
   - 인물이 제품·브랜드를 보증하는 것처럼 암시 금지 → 식별 가능한 인물(hook) 옆에는 브랜드명·추천 문구를 붙이지 않음 (hook 문구는 질문형 카피). 브랜드·버튼이 나오는 CTA 에는 얼굴 없는 손·책상 클립만 사용
   - 원본 그대로 재판매·스톡 사이트 재배포 금지 → 원본 파일은 제작용으로만 보관
   - 상표·로고로 사용 금지 → 해당 없음
+
+## ep02-zapier (Zapier 편) — 공식 Zapier asset
+
+| 구분 | 소스 | 파일 | 비고 |
+|---|---|---|---|
+| END wordmark | Zapier 공식 브랜드 사이트 · https://brand.zapier.com/ (press kit https://zapier.com/press 에서 링크) · 파일명 `zapier-logo_frost.svg` (흰 텍스트 + 오렌지 볼트, 어두운 배경용 공식 컬러 배리언트) | `assets/official/zapier-logo-frost.svg` · 2026-09-25 다운로드 | 공식 로고 그대로 사용, 변형 없음 |
+| PROOF (Trigger → Action → Action) | Zapier 공식 Help Center · "Zaps quick start guide" · https://help.zapier.com/hc/en-us/articles/22234847450893-Zaps-quick-start-guide · 원본 이미지 alt="Zap editor layout" (cdn.zappy.app/babd482c8371899f1b7663d4d6b575d2.png) | `assets/official/proof-trigger-action-action.png` · 2026-09-25 다운로드 | 공식 스크린샷 원본에서 위쪽 3단계(1. New Form Response in Google Forms → 2. Create Spreadsheet Row in Google Sheets → 3. Create Draft in Gmail)만 **크롭**. 픽셀 합성·텍스트 추가 없음. 원본은 전체 12단계 Zap 이었고 뒤쪽 Paths 분기는 이 영상 스코프(Trigger→Action→Action)에 불필요해 제외 |
+
+※ 두 asset 모두 Zapier 소유 자산이며, 이 프로젝트가 Zapier 공식 의뢰가 아니라면 광고 제작·배포 전 Zapier 브랜드 가이드라인(https://brand.zapier.com/) 상 사용 승인 여부를 확인해야 한다 (PREPRODUCTION 문서에 이미 명시된 사항).
