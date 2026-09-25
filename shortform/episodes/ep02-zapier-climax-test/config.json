@@ -1,0 +1,23 @@
+{
+  "_comment": "받고/잇고/닿고/다음 4컷만 보는 격리 테스트. engine/template_minimal.html은 V2와 동일 파일을 재사용하지만, timeline을 압축해 climax 4컷만 노출한다. ep02-zapier-v2의 config/timeline은 건드리지 않음.",
+  "episode": "ep02-zapier-climax-test",
+  "title": "Zapier climax 4-cut style test",
+  "template": "minimal",
+  "fps": 30,
+  "duration": 2.8,
+
+  "brand": { "name": "Zapier", "accent": "#FF4A00" },
+
+  "climaxPhotos": {
+    "badgo": { "word": "받고", "image": "assets/stock/user-supplied-badgo.jpg", "position": "50% 40%" },
+    "itgo":  { "word": "잇고", "image": "assets/stock/pixabay-3994018-itgo.jpg", "position": "45% 45%" },
+    "dahgo": { "word": "닿고", "image": "assets/stock/user-supplied-dahgo.jpg", "position": "38% 45%" },
+    "daeum": { "word": "다음", "image": "assets/stock/pexels-8553950-daeum.jpg", "position": "55% 42%" }
+  },
+
+  "timeline": {
+    "open": 0, "b1": 0, "b2": 0, "b3": 0, "b4": 0, "b5": 0, "turn": 0,
+    "proofIn": 0, "a1": 0, "a2": 0.7, "a3": 1.4, "a4": 2.1, "proofFull": 2.8,
+    "close": 2.8, "end": 2.8, "hold": 2.8, "total": 2.8
+  }
+}
