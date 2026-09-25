@@ -193,9 +193,19 @@ function renderClimax(t){
 
     const wEl = mk('div','word', capLayer, esc(photo.word));
     wEl.style.fontSize = (key === 'daeum' ? 168 : 140) + 'px'; // 다음은 앞 3컷보다 약간 크게
-    // 가로/세로 위치를 컷마다 조금씩 변주(기계적 반복 방지), 사진 구도에 맞춰 배치
-    const topPos = { badgo: 1500, itgo: 1120, dahgo: 300, daeum: 1560 }[key] || 960;
-    wEl.style.top = topPos + 'px';
+    // 사진의 구도(피사체 위치·여백)에 맞춘 배치 — 모션보다 composition이 우선.
+    //   받고: 위/중간/아래 모두 중앙을 관통하는 구도(양손이 좌우에서 들어와 중앙 문서를 주고받음) → CENTER, large
+    //   잇고: 카드가 화면 폭 대부분을 차지하는 와이드 구도, 카드 위쪽이 빈 배경 → 위쪽 여백에 CENTER
+    //   닿고: 폰/손이 화면 오른쪽에 몰림, 왼쪽은 빈 암부 → LEFT 여백에 배치
+    //   다음: 하이파이브(중앙 상단)와 별개로 오른쪽 아래에 세 번째 인물+노트북이 몰림 → 상대적으로 빈 왼쪽 아래에 배치
+    const POS = {
+      badgo: { left: 540, top: 960  },  // 양쪽 다 피사체 → 중앙
+      itgo:  { left: 540, top: 340  },  // 카드 위 여백
+      dahgo: { left: 380, top: 400  },  // 피사체 오른쪽 → 텍스트 왼쪽
+      daeum: { left: 380, top: 1600 },  // 피사체(3인) 오른쪽 아래 → 텍스트 왼쪽 아래
+    }[key] || { left: 540, top: 960 };
+    wEl.style.left = POS.left + 'px';
+    wEl.style.top = POS.top + 'px';
     const gradientText = (moving) => {
       wEl.style.background = 'linear-gradient(90deg,#B026FF 0%,#FF3D9A 45%,#FF7A18 100%)';
       wEl.style.webkitBackgroundClip = 'text'; wEl.style.backgroundClip = 'text'; wEl.style.color = 'transparent';
