@@ -161,6 +161,9 @@ function renderClimax(t){
     let cur = beats[beats.length - 1];
     for (const beat of beats) { if (t >= beat[0] && t < beat[1]) { cur = beat; break; } }
     const [a, b, key, word] = cur; const localT = t - a;
+    // 이 4컷(받고/잇고/닿고/다음)은 orange frame/border 없음 — orange는 텍스트 색/gradient에만 사용
+    box.style.border = 'none';
+    box.style.boxShadow = '0 30px 80px rgba(0,0,0,.6)';
     setClimaxCrop(img, 900, 590, key);
     const wEl = mk('div','word', capLayer, esc(word));
     wEl.style.fontSize = '96px';
