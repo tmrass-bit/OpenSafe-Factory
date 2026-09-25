@@ -6,32 +6,39 @@ const cfg = JSON.parse(fs.readFileSync(path.join(epDir, 'config.json'), 'utf8'))
 const out = path.resolve('out', cfg.episode); fs.mkdirSync(out, { recursive: true });
 const tpl = path.resolve('engine/template.html');
 const argFrames = process.argv.includes('--frames') ? process.argv[process.argv.indexOf('--frames') + 1].split(',').map(Number) : null;
-// hook 실사 배경: 원본 클립에서 hook 구간만큼 프레임 추출 (색감·블러는 config 값으로)
-let hookBg = null;
-const hb = cfg.hook && cfg.hook.background;
-if (hb && hb.src) {
-  const fps = cfg.fps || 30, len = ((cfg.timeline && cfg.timeline.stop) || 1.5) + 0.1;
-  const dir = path.join(out, 'hook_bg'); fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir);
-  const vf = [`fps=${fps}`, 'scale=1080:1920:force_original_aspect_ratio=increase', 'crop=1080:1920',
-    `eq=saturation=${hb.saturation ?? 0.6}`, hb.blur ? `gblur=sigma=${hb.blur}` : null].filter(Boolean).join(',');
-  execSync(`ffmpeg -loglevel error -y -ss ${hb.start || 0} -i "${path.resolve(hb.src)}" -t ${len} -vf "${vf}" -q:v 3 "${path.join(dir, '%03d.jpg')}"`);
-  hookBg = { count: fs.readdirSync(dir).filter(f => f.endsWith('.jpg')).length, fps, dim: hb.dim };
-}
 (async () => {
   const browser = await chromium.launch({ args: ['--font-render-hinting=none'] });
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
   page.on('pageerror', e => console.log('PAGEERR', e.message)); page.on('console', m => { if (m.type()==='error') console.log('CONSOLE', m.text()); });
-  await page.addInitScript(([c, hbg]) => { window.CONFIG = c; window.HOOK_BG = hbg; }, [cfg, hookBg && { ...hookBg, base: 'file://' + path.join(out, 'hook_bg') + '/' }]);
+  await page.addInitScript(c => { window.CONFIG = c; }, cfg);
+  // 1차 로드: 박자 타임라인(T)을 읽어 실사 배경을 각 장면 길이만큼만 추출
+  await page.goto('file://' + tpl + '?render=1');
+  const T = await page.evaluate(() => window.CUES.T);
+  const fps = cfg.fps || 30, BG = {};
+  const spans = { hook: [T.hook, T.stop], before: [T.before, T.turn], cta: [T.cta, T.end] };
+  for (const key of Object.keys(spans)) {
+    const bg = cfg[key] && cfg[key].background; if (!bg || !bg.src) continue;
+    const dir = path.join(out, 'bg_' + key); fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir);
+    const len = spans[key][1] - spans[key][0] + 0.2;
+    // 배경은 얕은 심도로 흐리게 쓰므로 절반 해상도로 추출해 용량을 줄임
+    const vf = [`fps=${fps}`, 'scale=540:960:force_original_aspect_ratio=increase', 'crop=540:960',
+      `eq=saturation=${bg.saturation ?? 0.6}`, bg.blur ? `gblur=sigma=${bg.blur / 2}` : null].filter(Boolean).join(',');
+    execSync(`ffmpeg -loglevel error -y -ss ${bg.start || 0} -i "${path.resolve(bg.src)}" -t ${len.toFixed(3)} -vf "${vf}" -q:v 4 "${path.join(dir, '%03d.jpg')}"`);
+    BG[key] = { count: fs.readdirSync(dir).filter(f => f.endsWith('.jpg')).length, fps, dim: bg.dim };
+  }
+  const bgFor = base => Object.fromEntries(Object.entries(BG).map(([k, v]) => [k, { ...v, base: base + 'bg_' + k + '/' }]));
+  // 2차 로드: 배경 프레임을 넘겨주고 로딩 완료까지 대기
+  await page.addInitScript(b => { window.BG = b; }, bgFor('file://' + out + '/'));
   await page.goto('file://' + tpl + '?render=1');
   await page.evaluate(() => document.fonts.ready);
   await page.evaluate(() => window.ASSETS_READY);
   const cues = await page.evaluate(() => window.CUES);
   fs.writeFileSync(path.join(out, 'cues.json'), JSON.stringify(cues, null, 1));
   // 미리보기용 HTML (설정 내장)
-  const html = fs.readFileSync(tpl, 'utf8').replace('<script>', `<script>window.CONFIG=${JSON.stringify(cfg)};window.HOOK_BG=${JSON.stringify(hookBg && { ...hookBg, base: 'hook_bg/' })};window.AUDIO_SRC='music.wav';</script>\n<script>`);
+  const html = fs.readFileSync(tpl, 'utf8').replace('<script>', `<script>window.CONFIG=${JSON.stringify(cfg)};window.BG=${JSON.stringify(bgFor(''))};window.AUDIO_SRC='music.wav';</script>\n<script>`);
   fs.writeFileSync(path.join(out, 'preview.html'), html);
   if (process.argv.includes('--preview-only')) { await browser.close(); return; }
-  const fps = cfg.fps || 30, dur = cfg.duration || 25;
+  const dur = cfg.duration || 25;
   if (argFrames) {
     for (const f of argFrames) { await page.evaluate(t => render(t), f / fps); await page.screenshot({ path: path.join(out, `still_${String(f).padStart(4, '0')}.png`) }); }
     await browser.close(); return;

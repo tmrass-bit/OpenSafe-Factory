@@ -26,7 +26,7 @@
   .nd { font-size:29px; color:#3c3c43; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
   /* ---------- desktop windows ---------- */
-  .win { position:absolute; background:#18181B; border:2px solid #2E2E33; border-radius:24px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.6); }
+  .win { position:absolute; background:rgba(24,24,27,.86); border:2px solid #2E2E33; border-radius:24px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.6); }
   .win.active { border-color:#fff; box-shadow:0 0 0 4px rgba(255,255,255,.18),0 30px 80px rgba(0,0,0,.6); }
   .tb { height:58px; background:#242428; display:flex; align-items:center; padding:0 20px; gap:10px; position:relative; }
   .tb i { width:16px; height:16px; border-radius:50%; display:block; }
@@ -85,9 +85,17 @@
   .ccard i + i { width:55%; background:rgba(255,255,255,.1); }
   .cbar { position:absolute; left:24px; right:24px; bottom:24px; height:64px; border-radius:16px; display:flex; align-items:center; padding:0 22px; gap:16px; font-size:21px; font-weight:800; }
   .cbar .tr { flex:1; height:16px; border-radius:8px; overflow:hidden; display:flex; background:#1d1d22; }
-  .shard { overflow:hidden; padding:18px 22px; box-shadow:0 20px 50px rgba(0,0,0,.5); }
-  .shard i { display:block; height:12px; border-radius:6px; background:rgba(255,255,255,.14); margin:0 0 12px; }
-  .shard i:nth-child(2){width:70%} .shard i:nth-child(3){width:45%}
+  /* turn: 분해 조각 · 모듈 */
+  .ghost { position:absolute; border-radius:22px; background:linear-gradient(180deg,rgba(70,70,80,.92),rgba(44,44,52,.92)); border:2px solid rgba(255,255,255,.26); overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.45); }
+  .ghost b { display:block; height:44px; background:rgba(255,255,255,.07); margin-bottom:10px; }
+  .ghost i { display:block; height:14px; border-radius:7px; background:rgba(255,255,255,.12); margin:16px 22px 0; }
+  .mod { position:absolute; border-radius:28px; background:linear-gradient(180deg,#1b1b21,#121216); border:2px solid #fff; overflow:hidden;
+    box-shadow:0 28px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08); }
+  .mod.lane { border-radius:26px; } .mod.drop { border-radius:22px; border-style:dashed; }
+  .mod .ml { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .mod .l { font-size:42px; font-weight:900; white-space:nowrap; letter-spacing:-0.02em; } .mod .s { font-size:24px; color:#a8a8ae; margin-top:4px; white-space:nowrap; }
+  .mod .b { opacity:0; }
+  .mod .sw { position:absolute; top:-20%; bottom:-20%; width:34%; left:0; background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.22),rgba(255,255,255,0)); opacity:0; }
   .chip { position:absolute; left:0; top:0; width:290px; height:60px; border-radius:16px; background:#2A2A2F; border:2px solid #55555c;
           display:flex; align-items:center; gap:12px; padding:0 14px; font-size:27px; font-weight:700; white-space:nowrap; will-change:transform; }
   .chip .tg { font-size:19px; font-weight:900; padding:3px 9px; border-radius:8px; color:#000; background:#888; }
@@ -121,7 +129,7 @@
 </head>
 <body>
 <div id="stage"></div>
-<script>window.CONFIG={"_comment":"에피소드 설정 파일. 이 파일의 문구/데이터만 바꾸면 새 영상이 만들어집니다. 시간 단위는 초(s).","episode":"ep01-inquiry","title":"고객문의 편","fps":30,"duration":25,"bpm":120,"brand":{"name":"브랜드명","logo":null,"accent":"#4F8CFF"},"hook":{"background":{"src":"assets/stock/pexels-12894337-mizuno-k.mp4","start":3,"dim":0.38,"blur":2,"saturation":0.55},"lines":["AI부터 붙이면","업무가 빨라질까요?"],"notifications":[{"app":"kakao","name":"카카오톡","title":"김사장님","body":"어제 주문한 거 언제 와요?"},{"app":"mail","name":"메일","title":"[견적문의] 50개 단체주문","body":"단가표 보내주실 수 있나요?"},{"app":"excel","name":"Excel","title":"접수현황_최종_진짜최종.xlsx","body":"3명이 동시에 편집 중"},{"app":"inquiry","name":"고객문의","title":"새 문의 3건","body":"환불 요청 · 배송 누락 · 옵션 변경"},{"app":"kakao","name":"카카오톡","title":"박팀장","body":"이거 누가 답변했어요??"},{"app":"mail","name":"메일","title":"Re: Re: Re: 교환 건","body":"아직 처리가 안 됐는데요"},{"app":"memo","name":"메모","title":"사장님 확인 필요","body":"환불 기준 다시 물어보기"},{"app":"kakao","name":"카카오톡","title":"고객센터 단톡 (23)","body":"사진 보냈어요 확인 부탁드려요"},{"app":"inquiry","name":"고객문의","title":"새 문의 5건","body":"주문번호 2381 외 4건"},{"app":"excel","name":"Excel","title":"재고표.xlsx","body":"#REF! 오류 12개"},{"app":"mail","name":"메일","title":"[긴급] 배송지 변경","body":"오늘 출고 전에 꼭 바꿔주세요"},{"app":"kakao","name":"카카오톡","title":"이대리","body":"그 고객 어제도 문의했었어요"},{"app":"inquiry","name":"고객문의","title":"새 문의 8건","body":"답변 대기 시간 3시간 초과"},{"app":"memo","name":"메모","title":"TODO","body":"엑셀에 옮겨 적기 (어제 거 포함)"}]},"stop":{"text":"아니요."},"before":{"counterLabel":"처리 대기 문의","counterFrom":12,"counterTo":47,"words":["읽고","찾고","옮기고","판단하고","다시 확인하고"],"windows":{"chat":{"title":"고객센터 단톡","bubbles":["배송 언제 와요?","옵션 잘못 골랐어요","환불 되나요?","사진 첨부했어요","답변 부탁드려요"]},"mail":{"title":"받은편지함","rows":[["김OO","교환 요청드립니다"],["(주)한빛","단체주문 견적 문의"],["이OO","배송지 변경 부탁"],["박OO","Re: 환불 건 확인"],["최OO","주문번호 2381 문의"],["정OO","제품 파손 사진"]],"search":"주문번호 2381"},"sheet":{"title":"접수현황.xlsx","cols":["일자","고객","유형","상태"]},"memo":{"title":"처리 기준 메모","lines":["환불? 교환?","→ 사장님께 확인","파손은 사진 먼저","단체주문은 누가?"]}},"chaosCaption":["문제는 AI가","없는 게 아니라"]},"turn":{"text":"일의 구조입니다."},"after":{"words":["나누고.","판단하고.","필요한 곳에만 AI."],"input":"고객 문의","classifier":"업무 분류","classifierSub":"유형 · 긴급도 · 규칙","lanes":[{"key":"ai","label":"AI · 자동화","sub":"반복 · 규칙","color":"#4F8CFF"},{"key":"human","label":"사람 판단","sub":"판단 필요","color":"#F5A524"},{"key":"exception","label":"예외 전달","sub":"담당자에게","color":"#FF5A5F"}],"items":[{"text":"배송 조회","lane":"ai"},{"text":"환불 요청","lane":"human"},{"text":"영업시간 문의","lane":"ai"},{"text":"제품 파손","lane":"exception"},{"text":"옵션 변경","lane":"ai"},{"text":"단체 견적","lane":"human"},{"text":"재입고 알림","lane":"ai"},{"text":"주소 변경","lane":"ai"},{"text":"클레임","lane":"exception"},{"text":"교환 가능?","lane":"human"},{"text":"송장 번호","lane":"ai"},{"text":"영수증 발급","lane":"ai"}]},"result":{"title":"오늘의 문의 현황","headline":"한눈에.","kpis":[{"label":"자동 처리","value":32,"lane":"ai"},{"label":"사람 판단","value":12,"lane":"human"},{"label":"예외 전달","value":3,"lane":"exception"}],"reviewTitle":"사람 판단 필요","reviews":[{"who":"김","text":"환불 요청 · 주문 2381","status":"검토중","lane":"human"},{"who":"박","text":"단체 견적 50개","status":"대기","lane":"human"},{"who":"이","text":"제품 파손 · 사진 확인","status":"전달됨","lane":"exception"}],"pendingLabel":"미처리 문의","pendingValue":0},"compare":{"before":{"tag":"BEFORE","text":"사람 머릿속 업무"},"after":{"tag":"AFTER","text":"누구나 따라가는 시스템"}},"core":{"first":"AI를 추가하지 않습니다.","second":["일하는 방식을","다시 설계합니다."],"highlight":"다시 설계"},"cta":{"service":"업무 구조화 · AI 워크플로 설계","question":["우리 업무도","바꿀 수 있을까?"],"button":"크몽에서 업무 진단받기 →"}};window.HOOK_BG={"count":48,"fps":30,"dim":0.38,"base":"hook_bg/"};window.AUDIO_SRC='music.wav';</script>
+<script>window.CONFIG={"_comment":"에피소드 설정 파일. 이 파일의 문구/데이터만 바꾸면 새 영상이 만들어집니다. 시간 단위는 초(s).","episode":"ep01-inquiry","title":"고객문의 편","fps":30,"duration":25,"bpm":110,"brand":{"name":"브랜드명","logo":null,"accent":"#4F8CFF"},"hook":{"background":{"src":"assets/stock/pexels-12894337-mizuno-k.mp4","start":3,"dim":0.38,"blur":2,"saturation":0.55},"lines":["AI부터 붙이면","업무가 빨라질까요?"],"notifications":[{"app":"kakao","name":"카카오톡","title":"김사장님","body":"어제 주문한 거 언제 와요?"},{"app":"mail","name":"메일","title":"[견적문의] 50개 단체주문","body":"단가표 보내주실 수 있나요?"},{"app":"excel","name":"Excel","title":"접수현황_최종_진짜최종.xlsx","body":"3명이 동시에 편집 중"},{"app":"inquiry","name":"고객문의","title":"새 문의 3건","body":"환불 요청 · 배송 누락 · 옵션 변경"},{"app":"kakao","name":"카카오톡","title":"박팀장","body":"이거 누가 답변했어요??"},{"app":"mail","name":"메일","title":"Re: Re: Re: 교환 건","body":"아직 처리가 안 됐는데요"},{"app":"memo","name":"메모","title":"사장님 확인 필요","body":"환불 기준 다시 물어보기"},{"app":"kakao","name":"카카오톡","title":"고객센터 단톡 (23)","body":"사진 보냈어요 확인 부탁드려요"},{"app":"inquiry","name":"고객문의","title":"새 문의 5건","body":"주문번호 2381 외 4건"},{"app":"excel","name":"Excel","title":"재고표.xlsx","body":"#REF! 오류 12개"},{"app":"mail","name":"메일","title":"[긴급] 배송지 변경","body":"오늘 출고 전에 꼭 바꿔주세요"},{"app":"kakao","name":"카카오톡","title":"이대리","body":"그 고객 어제도 문의했었어요"},{"app":"inquiry","name":"고객문의","title":"새 문의 8건","body":"답변 대기 시간 3시간 초과"},{"app":"memo","name":"메모","title":"TODO","body":"엑셀에 옮겨 적기 (어제 거 포함)"}]},"stop":{"text":"아니요."},"before":{"background":{"src":"assets/stock/pexels-7967182-darlene-alderson.mp4","start":1,"dim":0.55,"blur":5,"saturation":0.45},"counterLabel":"처리 대기 문의","counterFrom":12,"counterTo":47,"words":["읽고","찾고","옮기고","판단하고","다시 확인하고"],"windows":{"chat":{"title":"고객센터 단톡","bubbles":["배송 언제 와요?","옵션 잘못 골랐어요","환불 되나요?","사진 첨부했어요","답변 부탁드려요"]},"mail":{"title":"받은편지함","rows":[["김OO","교환 요청드립니다"],["(주)한빛","단체주문 견적 문의"],["이OO","배송지 변경 부탁"],["박OO","Re: 환불 건 확인"],["최OO","주문번호 2381 문의"],["정OO","제품 파손 사진"]],"search":"주문번호 2381"},"sheet":{"title":"접수현황.xlsx","cols":["일자","고객","유형","상태"]},"memo":{"title":"처리 기준 메모","lines":["환불? 교환?","→ 사장님께 확인","파손은 사진 먼저","단체주문은 누가?"]}},"chaosCaption":["문제는 AI가","없는 게 아니라"]},"turn":{"text":"일의 구조입니다.","modules":[{"label":"문의","sub":"들어오는 일"},{"label":"분류","sub":"유형 · 긴급도"},{"label":"자동화","sub":"반복 · 규칙"},{"label":"판단","sub":"사람이 결정"},{"label":"예외","sub":"규칙 밖"},{"label":"전달","sub":"담당자에게"}]},"after":{"words":["나누고.","판단하고.","필요한 곳에만 AI."],"input":"고객 문의","classifier":"업무 분류","classifierSub":"유형 · 긴급도 · 규칙","lanes":[{"key":"ai","label":"AI · 자동화","sub":"반복 · 규칙","color":"#4F8CFF"},{"key":"human","label":"사람 판단","sub":"판단 필요","color":"#F5A524"},{"key":"exception","label":"예외 전달","sub":"담당자에게","color":"#FF5A5F"}],"items":[{"text":"배송 조회","lane":"ai"},{"text":"환불 요청","lane":"human"},{"text":"영업시간 문의","lane":"ai"},{"text":"제품 파손","lane":"exception"},{"text":"옵션 변경","lane":"ai"},{"text":"단체 견적","lane":"human"},{"text":"재입고 알림","lane":"ai"},{"text":"주소 변경","lane":"ai"},{"text":"클레임","lane":"exception"},{"text":"교환 가능?","lane":"human"},{"text":"송장 번호","lane":"ai"},{"text":"영수증 발급","lane":"ai"}]},"result":{"title":"오늘의 문의 현황","headline":"한눈에.","kpis":[{"label":"자동 처리","value":32,"lane":"ai"},{"label":"사람 판단","value":12,"lane":"human"},{"label":"예외 전달","value":3,"lane":"exception"}],"reviewTitle":"사람 판단 필요","reviews":[{"who":"김","text":"환불 요청 · 주문 2381","status":"검토중","lane":"human"},{"who":"박","text":"단체 견적 50개","status":"대기","lane":"human"},{"who":"이","text":"제품 파손 · 사진 확인","status":"전달됨","lane":"exception"}],"pendingLabel":"미처리 문의","pendingValue":0},"compare":{"before":{"tag":"BEFORE","text":"사람 머릿속 업무"},"after":{"tag":"AFTER","text":"누구나 따라가는 시스템"}},"core":{"first":"AI를 추가하지 않습니다.","second":["일하는 방식을","다시 설계합니다."],"highlight":"다시 설계"},"cta":{"background":{"src":"assets/stock/pexels-6177738-cup-of-couple.mp4","start":2,"dim":0.5,"blur":3,"saturation":0.8},"service":"업무 구조화 · AI 워크플로 설계","question":["우리 업무도","바꿀 수 있을까?"],"button":"크몽에서 업무 진단받기 →"}};window.BG={"hook":{"count":55,"fps":30,"dim":0.38,"base":"bg_hook/"},"before":{"count":137,"fps":30,"dim":0.55,"base":"bg_before/"},"cta":{"count":101,"fps":30,"dim":0.5,"base":"bg_cta/"}};window.AUDIO_SRC='music.wav';</script>
 <script>
 /* =====================================================================
    SHORTFORM ENGINE  —  window.CONFIG 를 받아 render(t) 로 매 프레임을 그린다.
@@ -129,11 +137,18 @@
    ===================================================================== */
 const C = window.CONFIG;
 const W = 1080, H = 1920;
-const T = Object.assign({
-  hook:0, stop:1.5, stopHit:1.9, before:2.5, beat:0.5, chaos:5.0, turn:7.0, turnMorph:7.3, turnText:8.0, turnOut:9.6,
-  after:10.0, afterWords:[10.5,12.0,13.5], chipStart:10.55, chipGap:0.28, gather:14.55, result:15.0,
-  compare:17.0, core:18.5, core2:19.4, cta:21.0, end:25.0
-}, C.timeline || {});
+// 타임라인은 "박자(beat)" 단위로 정의 → 화면 전환·카드·텍스트·음악이 같은 박자 격자 위에 놓인다.
+// config.bpm 으로 템포, config.timeline 으로 개별 값(초 단위) 덮어쓰기.
+const BPM = C.bpm || 110, BT = 60 / BPM;
+const TB = {
+  hook:0, hookLine2:1.5, stop:3, stopHit:3.5, before:5, chaos:10, ramp:12.75, turn:13,
+  turnMorph:13.5, reveal:14, snap:17, assemble:18.5, turnText:19, turnOut:21, after:22,
+  afterWords:[22.5,24.5,26.5], chipStart:22.5, gather:30, result:31, compare:33.5, cmpAfter:34.5,
+  core:36.5, core2:38, cta:40
+};
+const T = {};
+for (const k in TB) T[k] = Array.isArray(TB[k]) ? TB[k].map(v => v * BT) : TB[k] * BT;
+Object.assign(T, { beat: BT, chipGap: BT / 2, revealGap: BT / 2, snapGap: BT / 4, end: C.duration || 25 }, C.timeline || {});
 const LANE_COLOR = {}; C.after.lanes.forEach(l => LANE_COLOR[l.key] = l.color);
 const LANE_IDX = {}; C.after.lanes.forEach((l,i) => LANE_IDX[l.key] = i);
 
@@ -164,45 +179,45 @@ function setTx(e,{x=0,y=0,s=1,o=1,r=0}={}){e.style.transform=`translate(-50%,-50
 // 박자에 맞춰 "쾅" 들어오는 글자
 function punch(e,t,t0,t1=1e9,from=1.35){
   if(t<t0||t>=t1){e.style.opacity=0;return;}
-  const p=eExpo(P(t,t0,t0+0.28)); setTx(e,{s:lerp(from,1,p),o:P(t,t0,t0+0.05)});
+  const p=eExpo(P(t,t0,t0+0.3)); setTx(e,{s:lerp(1+(from-1)*0.3,1,p), y:lerp(18,0,p), o:P(t,t0,t0+0.07)});
 }
-const CUES = {hits:[], words:[], clicks:[], whoosh:[], ticks:[], silence:[], chipLand:[]};
+const CUES = {hits:[], words:[], clicks:[], whoosh:[], ticks:[], silence:[], chipLand:[], tonal:[], snaps:[], mag:[]};
+
+/* ---------- 실사 배경: render.js 가 클립에서 프레임을 뽑아 window.BG[key] 로 넘겨줌 ---------- */
+const BG = window.BG || {}, bgImgsAll = [];
+function bgLayer(parent, key){
+  const B = BG[key], imgs = [];
+  if (!B || !B.count) return { draw(){}, on:false };
+  for (let i = 0; i < B.count; i++) { const im = new Image(); im.src = B.base + String(i + 1).padStart(3, '0') + '.jpg'; imgs.push(im); bgImgsAll.push(im); }
+  const cv = mk('canvas', 'abs', parent); cv.width = W; cv.height = H; Object.assign(cv.style, {left:0, top:0, width:W+'px', height:H+'px', zIndex:0});
+  const ctx = cv.getContext('2d');
+  const d = B.dim != null ? B.dim : 0.5;
+  const shade = mk('div', 'abs', parent); Object.assign(shade.style, {inset:0, zIndex:0,
+    background:`radial-gradient(ellipse at 50% 45%,rgba(0,0,0,${d*0.7}) 0%,rgba(0,0,0,${Math.min(1,d+0.3)}) 100%),linear-gradient(180deg,rgba(8,10,20,.35),rgba(0,0,0,0) 40%,rgba(0,0,0,.4))`});
+  return { on:true, cv, shade, draw(tl, s=1){
+    const im = imgs[Math.min(imgs.length - 1, Math.max(0, Math.floor(tl * (B.fps || 30))))];
+    if (!im || !im.complete || !im.naturalWidth) return;
+    const w = W * s, h = H * s; ctx.drawImage(im, (W - w) / 2, (H - h) / 2, w, h);
+  } };
+}
 
 /* =====================================================================
    1) HOOK — 알림 폭탄
    ===================================================================== */
 const Lhook = layer();
-// 실사 배경 (선택): config.hook.background → render.js 가 프레임을 뽑아 window.HOOK_BG 로 넘겨줌
-const HB = window.HOOK_BG, hbImgs = [];
-let hbCanvas = null, hbCtx = null, hbShade = null;
-if (HB && HB.count) {
-  for (let i = 0; i < HB.count; i++) { const im = new Image(); im.src = HB.base + String(i + 1).padStart(3, '0') + '.jpg'; hbImgs.push(im); }
-  hbCanvas = mk('canvas', 'abs', Lhook); hbCanvas.width = W; hbCanvas.height = H; Object.assign(hbCanvas.style, {left:0, top:0, width:W+'px', height:H+'px', zIndex:0});
-  hbCtx = hbCanvas.getContext('2d');
-  const d = HB.dim != null ? HB.dim : 0.5;
-  hbShade = mk('div', 'abs', Lhook); Object.assign(hbShade.style, {inset:0, zIndex:0,
-    background:`radial-gradient(ellipse at 50% 45%,rgba(0,0,0,${d*0.7}) 0%,rgba(0,0,0,${Math.min(1,d+0.3)}) 100%),linear-gradient(180deg,rgba(8,10,20,.35),rgba(0,0,0,0) 40%,rgba(0,0,0,.4))`});
-}
-window.ASSETS_READY = Promise.all(hbImgs.map(im => im.decode().catch(() => {})));
-function renderHookBg(t){
-  if (!hbCtx) return;
-  const im = hbImgs[Math.min(hbImgs.length - 1, Math.max(0, Math.floor(t * (HB.fps || 30))))];
-  if (!im || !im.complete || !im.naturalWidth) return;
-  const s = 1.1 - 0.06 * eCubic(P(t, 0, 1.5));   // 천천히 당겨지는 느낌 (알림 줌과 반대 방향)
-  const w = W * s, h = H * s;
-  hbCtx.drawImage(im, (W - w) / 2, (H - h) / 2, w, h);
-}
+const hookBg = bgLayer(Lhook, 'hook');
+function renderHookBg(t){ hookBg.draw(t - T.hook, 1.1 - 0.06 * eCubic(P(t, 0, T.stop))); }   // 알림 줌과 반대 방향으로 천천히 당김 (패럴랙스)
 const ICON = {kakao:'TALK', mail:'✉', excel:'X', inquiry:'?', memo:'≡'};
 const notis = C.hook.notifications.map((n,i)=>{
   const e=mk('div','noti',Lhook,`<div class="ic ic-${n.app}">${ICON[n.app]||'•'}</div><div class="nb"><div class="nh"><span>${esc(n.name)}</span><span>지금</span></div><div class="nt">${esc(n.title)}</div><div class="nd">${esc(n.body)}</div></div>`);
   const slots=[160,1480,420,1260,700,1640,300,1080,1560,560,1380,220,1180,860];
-  return {e, t0:-0.3+i*0.105, x:130+(R()-.5)*120, y:slots[i%slots.length]+(R()-.5)*60, r:(R()-.5)*9};
+  return {e, t0:-0.4+i*T.beat/4, x:130+(R()-.5)*120, y:slots[i%slots.length]+(R()-.5)*60, r:(R()-.5)*9};
 });
-notis.forEach(n=>{if(n.t0>0) CUES.ticks.push(n.t0);});
+notis.forEach((n,i)=>{if(n.t0>0 && i%2===0) CUES.ticks.push(n.t0);});   // 알림음은 8분음표마다만 (UI 사운드 절제)
 const hookShade = mk('div','band',Lhook); Object.assign(hookShade.style,{top:'620px',height:'700px',background:'linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.88) 25%,rgba(0,0,0,.88) 75%,rgba(0,0,0,0))'});
 const hook1 = bigText(Lhook, esc(C.hook.lines[0]), 880, 122);
 const hook2 = bigText(Lhook, esc(C.hook.lines[1]), 1045, 122);
-CUES.hits.push({t:0,k:'stab'}, {t:0.75,k:'stab'});
+CUES.hits.push({t:0,k:'stab'}, {t:T.hookLine2,k:'stab'});
 function renderHook(t){
   renderHookBg(t);
   const z=1+0.05*P(t,0,1.5);
@@ -218,9 +233,9 @@ function renderHook(t){
   hookShade.style.zIndex=100; hook1.style.zIndex=101; hook2.style.zIndex=101;
   hookShade.style.opacity=0.75+0.25*P(t,0,0.4);
   // 첫 프레임부터 글자가 보이도록 (0초에 이미 70% 등장)
-  const p1=eExpo(P(t,-0.12,0.2)); setTx(hook1,{s:lerp(1.3,1,p1),o:clamp(p1*1.4),y:lerp(90,0,eExpo(P(t,0.75,1.0)))*0 - 0});
-  hook1.style.opacity = t<0.75?1: 0.55; hook1.style.color = t<0.75?'#fff':'#cfcfcf';
-  punch(hook2,t,0.75);
+  const p1=eExpo(P(t,-0.12,0.2)); setTx(hook1,{s:lerp(1.06,1,p1),o:clamp(p1*1.4)});
+  hook1.style.opacity = t<T.hookLine2?1: 0.55; hook1.style.color = t<T.hookLine2?'#fff':'#cfcfcf';
+  punch(hook2,t,T.hookLine2);
 }
 
 /* =====================================================================
@@ -228,17 +243,18 @@ function renderHook(t){
    ===================================================================== */
 const Lstop = layer();
 const noTxt = bigText(Lstop, esc(C.stop.text), 960, 230);
-CUES.silence.push([T.stop, T.stopHit]); CUES.hits.push({t:T.stopHit,k:'impact'});
+// 스매시 컷: 알림 폭탄 → 완전한 검정 + 무음 → 박자 위에 "아니요." (흔들림·튐 없이 단정하게)
+CUES.silence.push([T.stop, T.stopHit]); CUES.hits.push({t:T.stopHit,k:'thud'});
 function renderStop(t){
-  punch(noTxt,t,T.stopHit,1e9,1.7);
-  const d=t-T.stopHit; const sh = d>0&&d<0.2 ? (1-d/0.2)*14 : 0;
-  Lstop.style.transform=`translate(${Math.sin(d*90)*sh}px,${Math.cos(d*70)*sh}px)`;
+  if(t<T.stopHit){ noTxt.style.opacity=0; return; }
+  setTx(noTxt,{s:lerp(1.03,1,eExpo(P(t,T.stopHit,T.stopHit+0.4))), o:1});
 }
 
 /* =====================================================================
    3) BEFORE + CHAOS — 업무창 데스크톱
    ===================================================================== */
 const Ldesk = layer(); Ldesk.style.background='radial-gradient(ellipse at 50% 40%,#17171b 0%,#050506 75%)';
+const deskBg = bgLayer(Ldesk, 'before');   // 타이핑하는 손 실사 — 얕은 심도(블러)로 뒤에 깔고 UI 창만 선명하게
 const deskInner = mk('div','abs',Ldesk); Object.assign(deskInner.style,{inset:0});
 const WB = C.before.windows;
 const WINS = {
@@ -279,7 +295,7 @@ const XW = XPOS.map(([x,y,w,h],i)=>{
   e.querySelector('.tb').style.borderBottom = `3px solid ${XAPP[n.app]||'#888'}`;
   const bd = mk('div','bdg',e, String(3+Math.floor(R()*20))); Object.assign(bd.style,{right:'16px',top:'9px'});
   Object.assign(e.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
-  return {e, x, y, w, h, t0: T.chaos+0.1+1.55*Math.pow(i/(XPOS.length-1),0.6), r:(R()-.5)*4, sh:i%2===0};
+  return {e, x, y, w, h, t0: T.chaos+[0,0.5,1,1.5,1.75,2,2.25,2.5][i]*T.beat, r:(R()-.5)*4, sh:i%2===0};
 });
 XW.forEach(w=>CUES.ticks.push(w.t0));
 // 기본 창 빨간 배지 (숫자 증가)
@@ -288,7 +304,7 @@ for(const k of wKeys){ const b=mk('div','bdg',WINS[k].e,'0'); Object.assign(b.st
 // 작은 알림 토스트 (오른쪽에서 밀고 들어와 아래로 쌓임)
 const TOASTS = C.hook.notifications.slice(6).map((n,j,a)=>{
   const e=mk('div','noti',Ldesk,`<div class="ic ic-${n.app}">${ICON[n.app]||'•'}</div><div class="nb"><div class="nh"><span>${esc(n.name)}</span><span>지금</span></div><div class="nt">${esc(n.title)}</div><div class="nd">${esc(n.body)}</div></div>`);
-  e.style.transformOrigin='100% 0'; return {e, t0:T.chaos+0.25+1.4*Math.pow(j/(a.length-1),0.7)};
+  e.style.transformOrigin='100% 0'; return {e, t0:T.chaos+[0.25,0.75,1.25,1.625,1.875,2.125,2.375,2.625][j]*T.beat};
 });
 TOASTS.forEach(q=>CUES.ticks.push(q.t0));
 // 상태 배지 (미분류 · 확인 필요) — 카운터 아래
@@ -302,7 +318,7 @@ const edgeFx = mk('div','abs',Ldesk); Object.assign(edgeFx.style,{inset:0,pointe
   background:'radial-gradient(ellipse 62% 55% at 50% 48%,rgba(0,0,0,0) 40%,rgba(0,0,0,.75) 100%)'});
 // 초점 이동(랙 포커스): 박자마다 한 창만 선명 → 마지막엔 전부 흐려짐
 const FOCUS=[]; { const base=['mail','sheet','chat','memo','mail'];
-  for(let k=0;k<5;k++){ const ft=T.chaos+0.05+k*0.33; const nw=XW.filter(w=>w.t0<=ft).pop();
+  for(let k=0;k<5;k++){ const ft=T.chaos+[0,0.75,1.5,2,2.5][k]*T.beat; const nw=XW.filter(w=>w.t0<=ft).pop();
     const el = (k%2 && nw)? nw : WINS[base[k]];
     FOCUS.push({t:ft, el:el.e, x:el.x+el.w*(0.3+R()*0.4), y:el.y+70+R()*(el.h-120)}); } }
 const glowRed = mk('div','abs',Ldesk); Object.assign(glowRed.style,{inset:0,boxShadow:'inset 0 0 260px rgba(255,40,40,.9)',pointerEvents:'none'});
@@ -324,18 +340,22 @@ FOCUS.forEach((f,k)=>{ const nx=FOCUS[k+1]||f; const [px,py]=CK[CK.length-1].sli
   CK.push([f.t,px,py],[f.t+0.08,f.x,f.y],[f.t+0.24,lerp(f.x,nx.x,0.22),lerp(f.y,nx.y,0.22)]);   // 휙 → 멈칫(다음 창 쪽으로 기웃)
   if(k===1||k===3) CLICKS.push(f.t+0.09); });
 { const l=CK[CK.length-1]; CK.push([T.turn,l[1],l[2]]); }
-CLICKS.forEach(c=>CUES.clicks.push(c));
+CUES.clicks.push(CLICKS[2], CLICKS[3]);   // 클릭음은 복사·붙여넣기 두 번만
 C.before.words.forEach((w,i)=>CUES.words.push(b0+i*bt));
-CUES.words.push(T.chaos); CUES.words.push(T.chaos+0.5);
+CUES.words.push(T.chaos); CUES.words.push(T.chaos+T.beat);
 function cursorAt(t){
   for(let i=0;i<CK.length-1;i++){const a=CK[i],b=CK[i+1]; if(t>=a[0]&&t<=b[0]){const p=eInOut(P(t,a[0],b[0])); return [lerp(a[1],b[1],p),lerp(a[2],b[2],p)];}}
   const l=t<CK[0][0]?CK[0]:CK[CK.length-1]; return [l[1],l[2]];
 }
 
+// 스피드 램프: ramp~turn 구간은 0.35배속(슬로모션)으로 흘러가다가 turn 에서 완전 정지
+const deskTime = t => t < T.ramp ? t : T.ramp + (Math.min(t, T.turn) - T.ramp) * 0.35;
+const DESK_END = deskTime(T.turn);
 function renderDesk(t, freezeT){
   const tf = freezeT!=null? Math.min(t,freezeT) : t;   // 정지 구간에선 시간 고정
   const beat = Math.floor((tf-b0)/bt);            // 0..4 (BEFORE 단어 인덱스)
-  const chaos = P(tf,T.chaos,T.turn);
+  const chaos = P(tf,T.chaos,DESK_END);
+  deskBg.draw(tf - T.before, 1.04 + 0.03*chaos);   // 배경은 UI 보다 느리게 움직여 깊이감(패럴랙스)
   // windows: active highlight + chaos jitter
   const actMap=['chat','mail','sheet','memo', null];
   let act = (beat>=0&&beat<4)? actMap[beat] : null;
@@ -375,7 +395,6 @@ function renderDesk(t, freezeT){
   let rp=-1; CLICKS.forEach(c=>{if(tf>=c&&tf<c+0.22) rp=c;});
   if(rp>=0){const p=P(tf,rp,rp+0.22); const [rx,ry]=cursorAt(rp); Object.assign(ripple.style,{left:(rx-45)+'px',top:(ry-45)+'px',opacity:1-p,transform:`scale(${0.3+p})`,zIndex:49});} else ripple.style.opacity=0;
   // chaos: 창 중첩 · 배지 증가 · 토스트 · 랙 포커스
-  const live = freezeT==null || t<T.turn;
   XW.forEach((w,i)=>{
     if(tf<w.t0){w.e.style.opacity=0;return;}
     const p=eBack(P(tf,w.t0,w.t0+0.16)), d=tf-w.t0;
@@ -400,7 +419,7 @@ function renderDesk(t, freezeT){
   counter.style.zIndex=45;
   // 랙 포커스
   let fc=null; FOCUS.forEach(f=>{ if(tf>=f.t) fc=f; });
-  const collapse = P(tf,T.turn-0.35,T.turn-0.05);
+  const collapse = P(tf,T.ramp-0.25*T.beat,DESK_END);   // 초점 붕괴
   const allW = wKeys.map(k=>WINS[k].e).concat(XW.map(w=>w.e));
   allW.forEach(e=>{ if(!fc){e.style.filter='';return;}
     const sharp = e===fc.el ? collapse : 1;
@@ -415,48 +434,112 @@ function renderDesk(t, freezeT){
   wordShade.style.zIndex=60;
   words.forEach((w,i)=>{w.style.zIndex=61; punch(w,tf,b0+i*bt,b0+(i+1)*bt,1.45);});
   cap1.style.zIndex=61; cap2.style.zIndex=61;
-  if(tf>=T.chaos){punch(cap1,tf,T.chaos,1e9,1.3); punch(cap2,tf,T.chaos+0.5,1e9,1.3);} else {cap1.style.opacity=0;cap2.style.opacity=0;}
+  if(tf>=T.chaos){punch(cap1,tf,T.chaos,1e9,1.3); punch(cap2,tf,T.chaos+T.beat,1e9,1.3);} else {cap1.style.opacity=0;cap2.style.opacity=0;}
   // chaos: 화면 흔들림
   deskInner.style.transformOrigin='50% 45%';
   deskInner.style.transform=`translate(${Math.sin(tf*53)*amp*0.4}px,${Math.cos(tf*47)*amp*0.4}px) ${camT}`;
 }
 
 /* =====================================================================
-   4) TURNING POINT — 프리즈 프레임 → 창이 조각나 3갈래 그리드로 스냅 → "일의 구조입니다." → 줌 스루
+   4) TURNING POINT — "일의 구조입니다."
+   프리즈 → 분해(Exploded View·패럴랙스) → 모듈 등장(박자마다 Tonal Hit) → 격자 스냅(Mechanical Snap)
+   → 조립(연결) → 완성(Sub Impact 1회 · Impact Frame · Light Sweep) → 푸시인 + 카피 → AFTER 3레인으로 모프
    ===================================================================== */
-const LX_T=[195,540,885];
-const Lturn = layer();
-const turnWrap = mk('div','abs',Lturn); Object.assign(turnWrap.style,{inset:0});
+// AFTER 흐름도와 같은 좌표계 (조립 완성형 = AFTER 첫 프레임 → 모프가 끊김 없이 이어짐)
+const NODE_IN={x:540,y:560}, NODE_CL={x:540,y:860}, LANE_Y=1150, SLOT_Y=1300, SLOT_GAP=72;
+const LX=[195,540,885];
+const branchD = i => `M540,${NODE_CL.y+75} C540,${NODE_CL.y+170} ${LX[i]},${LANE_Y-170} ${LX[i]},${LANE_Y-75}`;
+const trunkD = `M540,${NODE_IN.y+62} L540,${NODE_CL.y-75}`;
+
+const Lturn = layer(); Object.assign(Lturn.style,{perspective:'1900px', perspectiveOrigin:'50% 45%'});
+const world = mk('div','abs',Lturn); Object.assign(world.style,{inset:0, transformStyle:'preserve-3d', transformOrigin:'540px 900px'});
 const turnTxt = bigText(Lturn, esc(C.turn.text), 960, 170);
 const flash = mk('div','abs',stage); Object.assign(flash.style,{inset:0,background:'#fff',opacity:0,zIndex:999,pointerEvents:'none'});
-CUES.silence.push([T.turn, T.turnMorph]); CUES.whoosh.push({t:T.turnMorph,d:0.65,k:'riser'}); CUES.hits.push({t:T.turnText,k:'impact'});
-CUES.whoosh.push({t:T.turnOut,d:0.4,k:'swish'});
-// 조각: 창 4개 × 가로 3등분 = 12조각 → 3열(레인 색) × 4행 그리드
-const SH=[]; { let n=0; const rowsY=[330,500,1420,1590];
-  for(const k of wKeys){ const g=WINS[k]; for(let r=0;r<3;r++){
-    const e=mk('div','abs',turnWrap,'<i></i><i></i><i></i>');
-    const col=n%3, row=Math.floor(n/3), lane=C.after.lanes[col];
-    SH.push({e, x0:g.x, y0:g.y+r*g.h/3, w0:g.w, h0:g.h/3, x1:LX_T[col]-150, y1:rowsY[row]-70, w1:300, h1:140,
-      r0:(R()-.5)*8, rm:(R()-.5)*40, d:R()*0.12, col:lane.color}); n++; } } }
+
+// (a) 분해 조각: 정지된 화면의 창들이 얇은 패널로 떠오름
+const GH = wKeys.map(k=>WINS[k]).concat(XW).map((g,i)=>{
+  const e=mk('div','ghost',world,'<b></b><i style="width:78%"></i><i style="width:58%"></i><i style="width:68%"></i>');
+  Object.assign(e.style,{left:g.x+'px',top:g.y+'px',width:g.w+'px',height:g.h+'px'});
+  const cx=g.x+g.w/2, cy=g.y+g.h/2;
+  return {e, cx, cy, z:[-420,160,-260,60,-120,240,-360,120,-60,-300,200,-200][i%12], ox:(cx-540)*0.14, oy:(cy-900)*0.1};
+});
+// (b) 모듈: AFTER 흐름도의 노드/레인과 같은 크기·위치로 만들어 두고, 분해 상태에선 축소·오프셋
+const MODS = C.turn.modules || [{label:'문의'},{label:'분류'},{label:'자동화'},{label:'판단'},{label:'예외'},{label:'전달'}];
+const L3 = C.after.lanes;
+const MT = [ // 목표(조립) 위치 · 크기 · 강조색 · 모프 후 라벨
+  {x:NODE_IN.x, y:NODE_IN.y, w:480, h:124, col:'#E8E8EC', kind:'node', to:[C.after.input,'']},
+  {x:NODE_CL.x, y:NODE_CL.y, w:520, h:150, col:'#FFFFFF', kind:'node', to:[C.after.classifier, C.after.classifierSub]},
+  {x:LX[0], y:LANE_Y, w:310, h:150, col:L3[0].color, kind:'lane', to:[L3[0].label, L3[0].sub]},
+  {x:LX[1], y:LANE_Y, w:310, h:150, col:L3[1].color, kind:'lane', to:[L3[1].label, L3[1].sub]},
+  {x:LX[2], y:LANE_Y, w:310, h:150, col:L3[2].color, kind:'lane', to:[L3[2].label, L3[2].sub]},
+  {x:LX[2], y:LANE_Y+190, w:310, h:110, col:L3[2].color, kind:'drop', to:['','']},
+];
+const SRC = [2,0,1,4,6,5];   // 각 모듈이 빠져나오는 분해 조각 (목표 위치와 먼 조각 → 스냅 이동이 보이게)
+const MD = MODS.slice(0,6).map((m,i)=>{
+  const t=MT[i], g=GH[SRC[i]%GH.length];
+  const e=mk('div','mod '+t.kind,world,`<div class="ml a"><div class="l">${esc(m.label)}</div>${m.sub?`<div class="s">${esc(m.sub)}</div>`:''}</div>`+
+    `<div class="ml b"><div class="l">${esc(t.to[0])}</div>${t.to[1]?`<div class="s">${esc(t.to[1])}</div>`:''}</div><div class="sw"></div>`);
+  Object.assign(e.style,{left:t.x+'px',top:t.y+'px',width:t.w+'px',height:t.h+'px'});
+  const rv=T.reveal+i*T.revealGap, land=T.snap+i*T.snapGap;
+  CUES.tonal.push({t:rv, n:i}); CUES.snaps.push(land);
+  return {e, t, g, rv, land, a:e.querySelector('.a'), b:e.querySelector('.b'), sw:e.querySelector('.sw')};
+});
+// (c) 연결선: AFTER 흐름도와 동일한 경로
+const tSvg = svgLayer(world); tSvg.style.transform='translateZ(-1px)';
+const tTrunk = svgEl('path',{d:trunkD,stroke:'#fff','stroke-width':4,fill:'none'},tSvg);
+const tBr = L3.map((l,i)=>svgEl('path',{d:branchD(i),stroke:l.color,'stroke-width':5,fill:'none','stroke-linecap':'round'},tSvg));
+const tDrop = svgEl('path',{d:`M${LX[2]},${LANE_Y+75} L${LX[2]},${LANE_Y+135}`,stroke:L3[2].color,'stroke-width':4,fill:'none'},tSvg);
+const CONN = [tTrunk,...tBr,tDrop];
+CUES.silence.push([T.turn, T.turnMorph]);
+CUES.mag.push(T.assemble); CUES.hits.push({t:T.turnText,k:'impact'}, {t:T.turnText,k:'bloom'});
+
 function renderTurn(t){
-  const out=P(t,T.turnOut,T.after);
-  SH.forEach((q,j)=>{
-    // 스피드 램프: 천천히 떠오르다가 한 번에 스냅
-    const u=P(t,T.turnMorph+q.d,T.turnText-0.05), p=u<0.6? 0.08*eCubic(u/0.6) : lerp(0.08,1,eExpo((u-0.6)/0.4));
-    const snap = t>=T.turnText ? 1+0.07*(1-eExpo(P(t,T.turnText,T.turnText+0.25))) : 1;
-    const x=lerp(q.x0,q.x1,p), y=lerp(q.y0,q.y1,p), w=lerp(q.w0,q.w1,p), h=lerp(q.h0,q.h1,p);
-    const rot = lerp(q.r0, 0, p) + q.rm*Math.sin(Math.PI*p);
-    const vel = (u>0.6&&u<1)? (1-(u-0.6)/0.4) : 0;
-    Object.assign(q.e.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px',borderRadius:lerp(10,26,p)+'px',
-      background: p>0.9? q.col+'2e' : '#1b1b1f', border:`2px solid ${p>0.9? q.col : '#3a3a40'}`,
-      transform:`rotate(${rot}deg) scale(${snap})`, filter: vel>0.05? `blur(${6*vel}px)` : '', opacity: 1});
-    q.e.className='abs shard';
+  const B=T.beat;
+  // 카메라: 분해 시 비스듬히 기울어진 입체 → 스냅 전에 정면으로 평탄화 → 완성 후 푸시인 → 모프 전에 원위치
+  const ex = eInOut(P(t,T.turnMorph,T.turnMorph+0.5*B));            // 분해
+  const flat = eInOut(P(t,T.snap-0.5*B,T.snap+0.25*B));             // 정면화
+  const drift = P(t,T.turnMorph,T.snap);                             // 느린 패럴랙스 드리프트
+  const rx = lerp(0,16,ex)*(1-flat), ry = (lerp(0,-18,ex)+6*drift)*(1-flat);
+  const push = eInOut(P(t,T.turnText,T.turnOut))*(1-eInOut(P(t,T.turnOut,T.after)));
+  const sc = lerp(1,0.92,ex*(1-flat)) * (1+0.05*push);
+  world.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(${sc})`;
+  // 분해 조각: 깊이별로 흩어졌다가, 모듈이 빠져나가며 사라짐
+  GH.forEach((g,i)=>{
+    const src = MD.find(m=>m.g===g);
+    const fade = src ? P(t,src.rv,src.rv+0.5*B) : P(t,T.snap-0.5*B,T.snap+0.5*B);
+    g.e.style.transform = `translate3d(${g.ox*ex}px,${g.oy*ex}px,${g.z*ex - 200*fade}px)`;
+    g.e.style.opacity = t<T.turnMorph ? 0 : 0.9*(1-fade);
   });
-  // 연출 카메라: 스냅 후 느린 푸시인 → 마지막엔 줌 스루(화면 속으로 돌진)
-  const push = 1+0.04*P(t,T.turnText,T.turnOut), zt = eInOut(out);
-  turnWrap.style.transform=`scale(${push*lerp(1,5,zt*zt)})`; turnWrap.style.filter = out>0? `blur(${18*zt}px)` : ''; turnWrap.style.opacity=1-P(out,0.5,1);
-  if(t>=T.turnText){ const p=eExpo(P(t,T.turnText,T.turnText+0.3)); setTx(turnTxt,{s:lerp(1.5,1,p)*push*lerp(1,3.5,zt*zt), o:clamp(P(t,T.turnText,T.turnText+0.05))*(1-P(out,0.35,0.9))});
-    turnTxt.style.filter = out>0? `blur(${10*zt}px)` : ''; } else turnTxt.style.opacity=0;
+  // 모듈
+  MD.forEach((m,i)=>{
+    const shown = P(t,m.rv,m.rv+0.35*B);                           // 등장 (조각에서 앞으로 빠져나옴)
+    const fl = P(t,m.land-0.4*B,m.land), fp = eExpo(fl);           // 스냅 비행 → 정확한 박자에 착지
+    const gx = m.g.cx + m.g.ox*ex - m.t.x, gy = m.g.cy + m.g.oy*ex - m.t.y;
+    const dx = lerp(gx,0,fp), dy = lerp(gy,0,fp), dz = lerp(m.g.z*ex + 180*eCubic(shown), 0, fp);
+    const s0 = 0.72;
+    let s = lerp(s0, 1, fp);
+    const settle = P(t,T.assemble,T.assemble+0.5*B); s *= 1 + 0.02*Math.sin(Math.PI*settle);      // 조립: 맞물림
+    m.e.style.transform = `translate(-50%,-50%) translate3d(${dx}px,${dy}px,${dz}px) scale(${s})`;
+    m.e.style.opacity = t<m.rv ? 0 : clamp(shown*1.6);
+    const v = fl>0&&fl<1 ? (1-fp) : 0;                                 // 비행 중에만 모션 블러
+    m.e.style.filter = v>0.05 ? `blur(${5*v}px)` : '';
+    m.e.style.borderColor = m.t.col;
+    // 완성 순간 한 번 지나가는 빛 (왼쪽 → 오른쪽, 위치에 따라 순차)
+    const sp = P(t, T.turnText + (m.t.x/1080)*0.3*B, T.turnText + (m.t.x/1080)*0.3*B + 0.8*B);
+    m.sw.style.transform = `translateX(${lerp(-140,260,sp)}%) skewX(-18deg)`; m.sw.style.opacity = sp>0&&sp<1 ? 1 : 0;
+    // 모프: 모듈 라벨 → AFTER 라벨, 모듈 스타일 → 흐름도 스타일
+    const mo = eInOut(P(t,T.turnOut+0.2*B,T.after-0.2*B));
+    m.a.style.opacity = 1-mo; m.b.style.opacity = mo;
+    if(m.t.kind==='drop'){ m.e.style.transform += ` translateY(${-190*mo}px)`; m.e.style.opacity = parseFloat(m.e.style.opacity)*(1-mo); }
+  });
+  // 연결선: 조립 박자에 맞춰 뻗어 나감
+  CONN.forEach((c,i)=>{ if(!c._len) c._len=c.getTotalLength(); const p=eCubic(P(t,T.assemble+i*0.06*B,T.assemble+0.5*B+i*0.06*B));
+    c.setAttribute('stroke-dasharray',c._len); c.setAttribute('stroke-dashoffset',c._len*(1-p)); c.setAttribute('opacity', i===CONN.length-1 ? 1-eInOut(P(t,T.turnOut,T.after)) : 1); });
+  // 랙 포커스: 카피가 뜨는 동안 구조는 한 단계 뒤로 (흐림·어둡게), 모프 직전 다시 선명하게
+  const foc = eInOut(P(t,T.turnText+0.25*B,T.turnText+0.75*B))*(1-eInOut(P(t,T.turnOut,T.turnOut+0.5*B)));
+  world.style.filter = foc>0.01 ? `blur(${3.5*foc}px) brightness(${1-0.55*foc})` : '';
+  if(t>=T.turnText+0.25*B){ const p=eExpo(P(t,T.turnText+0.25*B,T.turnText+0.9*B)), o=1-P(t,T.turnOut,T.turnOut+0.5*B);
+    setTx(turnTxt,{s:lerp(1.05,1,p)*(1+0.03*push), y:lerp(24,0,p)-30*(1-o), o:clamp(p*1.5)*o}); } else turnTxt.style.opacity=0;
 }
 
 /* =====================================================================
@@ -465,15 +548,12 @@ function renderTurn(t){
 const Lflow = layer();
 const flowWrap = mk('div','abs',Lflow); Object.assign(flowWrap.style,{inset:0});
 const fSvg = svgLayer(flowWrap);
-const NODE_IN={x:540,y:560}, NODE_CL={x:540,y:860}, LANE_Y=1150, SLOT_Y=1300, SLOT_GAP=72;
-const LX=[195,540,885];
 const nIn = mk('div','node',flowWrap,`<div class="l">${esc(C.after.input)}</div>`); Object.assign(nIn.style,{left:NODE_IN.x+'px',top:NODE_IN.y+'px',width:'480px',height:'124px'});
 const nCl = mk('div','node',flowWrap,`<div class="l">${esc(C.after.classifier)}</div><div class="s">${esc(C.after.classifierSub)}</div>`); Object.assign(nCl.style,{left:NODE_CL.x+'px',top:NODE_CL.y+'px',width:'520px',height:'150px'});
 const trunkIn = svgEl('path',{d:`M540,-40 L540,${NODE_IN.y-62}`,stroke:'#fff','stroke-width':3,opacity:.35,fill:'none','stroke-dasharray':'8 14'},fSvg);
-const trunk = svgEl('path',{d:`M540,${NODE_IN.y+62} L540,${NODE_CL.y-75}`,stroke:'#fff','stroke-width':4,fill:'none'},fSvg);
+const trunk = svgEl('path',{d:trunkD,stroke:'#fff','stroke-width':4,fill:'none'},fSvg);
 const branches = C.after.lanes.map((l,i)=>{
-  const d=`M540,${NODE_CL.y+75} C540,${NODE_CL.y+170} ${LX[i]},${LANE_Y-170} ${LX[i]},${LANE_Y-75}`;
-  const p=svgEl('path',{d,stroke:l.color,'stroke-width':5,fill:'none','stroke-linecap':'round'},fSvg);
+  const p=svgEl('path',{d:branchD(i),stroke:l.color,'stroke-width':5,fill:'none','stroke-linecap':'round'},fSvg);
   return p;
 });
 const laneEls = C.after.lanes.map((l,i)=>{const e=mk('div','lane',flowWrap,`<div class="l">${esc(l.label)}</div><div class="s">${esc(l.sub)}</div><div class="c" style="background:${l.color}">0</div>`);
@@ -482,15 +562,16 @@ const flowWords = C.after.words.map(w=>bigText(Lflow, esc(w), 250, 128));
 const TAG = {ai:'AI', human:'사람', exception:'전달'};
 // chips
 const laneCount=[0,0,0];
+const CH_LAND = 1.5*T.beat, CH_K = CH_LAND/0.72;   // 원래 0.72초 동작을 1.5박에 맞춰 늘림
 const CHIPS = C.after.items.map((it,i)=>{
   const li = LANE_IDX[it.lane]; const slot = laneCount[li]++;
   const e = mk('div','chip',flowWrap,`<span class="tg">${TAG[it.lane]||''}</span><span>${esc(it.text)}</span>`);
   const t0 = T.chipStart + i*T.chipGap;
-  CUES.whoosh.push({t:t0+0.28,d:0.2,k:'swish'}); CUES.chipLand.push(t0+0.72);
+  CUES.chipLand.push({t:t0+CH_LAND, lane:li});
   return {e, it, li, slot, t0, tg:e.querySelector('.tg')};
 });
 function chipPos(c,t){
-  const s=t-c.t0; const lx=LX[c.li]; const sy=SLOT_Y+c.slot*SLOT_GAP;
+  const s=(t-c.t0)/CH_K; const lx=LX[c.li]; const sy=SLOT_Y+c.slot*SLOT_GAP;
   const br=branches[c.li]; if(!br._len) br._len=br.getTotalLength();
   if(s<0.2){const p=eCubic(s/0.2); return [540, lerp(-60,NODE_IN.y,p), 0];}
   if(s<0.26) return [540, NODE_IN.y, 0];
@@ -504,24 +585,25 @@ function renderFlow(t){
   flowWrap.style.transform='';
   const a=T.after;
   // nodes
-  const pin=eBack(P(t,a,a+0.25)), pcl=eBack(P(t,a+0.25,a+0.5));
-  setTx(nIn,{s:pin,o:clamp(pin)}); setTx(nCl,{s:pcl,o:clamp(pcl)});
-  trunk.setAttribute('opacity',P(t,a,a+0.1)); trunkIn.setAttribute('opacity',0.35*P(t,a,a+0.2));
+  setTx(nIn,{s:1,o:1}); setTx(nCl,{s:1,o:1});
+  trunk.setAttribute('opacity',1); trunkIn.setAttribute('opacity',0.35*P(t,a,a+0.5*T.beat));
   trunkIn.setAttribute('stroke-dashoffset', -t*120);
-  branches.forEach((b,i)=>{ if(!b._len) b._len=b.getTotalLength(); const p=eCubic(P(t,a+0.55+i*0.08,a+0.85+i*0.08)); b.setAttribute('stroke-dasharray',b._len); b.setAttribute('stroke-dashoffset',b._len*(1-p)); });
+
   // emphasis
   const w=T.afterWords; let focus=-1;
   if(t>=w[1]&&t<w[2]) focus=LANE_IDX.human; else if(t>=w[2]&&t<T.gather-0.1) focus=LANE_IDX.ai;
-  laneEls.forEach((e,i)=>{const p=eBack(P(t,a+0.6+i*0.1,a+0.85+i*0.1)); const f= focus===i;
-    setTx(e,{s:p*(f?1.08:1),o:clamp(p)*(focus>=0&&!f?0.45:1)});
-    e.style.boxShadow = f? `0 0 60px ${C.after.lanes[i].color}` : 'none';
+  const fStart = focus===LANE_IDX.human ? w[1] : w[2], fp = eInOut(P(t,fStart,fStart+0.5*T.beat));
+  laneEls.forEach((e,i)=>{const f= focus===i;
+    setTx(e,{s:f?lerp(1,1.06,fp):1,o:(focus>=0&&!f?0.45:1)});   // 랙 포커스: 해당 레인만 선명
+    e.style.boxShadow = 'none';
     e.style.background = f? C.after.lanes[i].color+'33' : '#101014';
-    const n=CHIPS.filter(c=>c.li===i && t>=c.t0+0.72).length; e.cnt.textContent=n; });
+    const n=CHIPS.filter(c=>c.li===i && t>=c.t0+CH_LAND).length; e.cnt.textContent=n; });
   branches.forEach((b,i)=>b.setAttribute('opacity', focus>=0&&focus!==i?0.3:1));
   // classifier pulse on each chip
-  let pulse=0, pc='#3a3a40'; CHIPS.forEach(c=>{const s=t-c.t0; if(s>=0.38&&s<0.5){pulse=1-(s-0.38)/0.12; pc=LANE_COLOR[c.it.lane];}});
-  nCl.style.borderColor = pulse>0? pc : '#3a3a40'; nCl.style.boxShadow = pulse>0? `0 0 ${50*pulse}px ${pc}`:'none';
-  let pin2=0; CHIPS.forEach(c=>{const s=t-c.t0; if(s>=0.18&&s<0.3) pin2=1;}); nIn.style.borderColor=pin2?'#fff':'#3a3a40';
+  // 분류 노드: 카드가 지나갈 때 테두리 색만 바뀜 (글로우 반복 없음)
+  let pc='#3a3a40'; CHIPS.forEach(c=>{const s=(t-c.t0)/CH_K; if(s>=0.38&&s<0.5) pc=LANE_COLOR[c.it.lane];});
+  nCl.style.borderColor = pc; nCl.style.boxShadow = 'none';
+  let pin2=0; CHIPS.forEach(c=>{const s=(t-c.t0)/CH_K; if(s>=0.18&&s<0.3) pin2=1;}); nIn.style.borderColor=pin2?'#fff':'#3a3a40';
   // chips
   CHIPS.forEach(c=>{
     if(t<c.t0){c.e.style.opacity=0;return;}
@@ -542,7 +624,7 @@ function renderFlow(t){
   [nIn,nCl,...laneEls].forEach(e=>{e.style.opacity=parseFloat(e.style.opacity||1)*(1-g);});
   fSvg.style.opacity=1-g;
 }
-C.after.words.forEach((w,i)=>CUES.hits.push({t:T.afterWords[i],k:'stab'}));
+C.after.words.forEach((w,i)=>CUES.hits.push({t:T.afterWords[i],k:'word'}));
 
 /* =====================================================================
    6) RESULT — 대시보드
@@ -563,7 +645,9 @@ CUES.hits.push({t:T.result,k:'soft'});
 function renderDash(t){
   const a=T.gather+0.15;
   const p=eExpo(P(t,a,a+0.45));
-  dash.style.opacity=clamp(P(t,a,a+0.15)); dash.style.transform=`translateY(${lerp(120,0,p)}px) scale(${lerp(0.94,1,p)})`;
+  // 풀아웃: KPI 한 줄에 붙어 있던 카메라가 물러나며 대시보드 전체(시스템)를 공개
+  const po = eInOut(P(t,T.result-0.5*T.beat,T.result+1.5*T.beat));
+  dash.style.opacity=clamp(P(t,a,a+0.15)); dash.style.transformOrigin='50% 18%'; dash.style.transform=`scale(${lerp(1.32,1,po)})`;
   punch(dashHead,t,T.result,1e9,1.3);
   C.result.kpis.forEach((k,i)=>{kvs[i].textContent=Math.round(k.value*eCubic(P(t,a+0.2,a+0.9)));
     segs[i].style.width = (100*k.value/kTot*eInOut(P(t,a+0.35,a+1.0)))+'%';});
@@ -609,19 +693,22 @@ const botTxt = mk('div','abs',pBot,`<div class="tag" style="background:#4F8CFF;c
 const botBig = bigText(pBot, esc(C.compare.after.text), 200, 96);
 const arrow = mk('div','abs',Lcmp,'<svg width="130" height="130" viewBox="0 0 130 130"><circle cx="65" cy="65" r="62" fill="#fff"/><path d="M65 35 L65 92 M42 70 L65 93 L88 70" stroke="#000" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
 Object.assign(arrow.style,{left:'475px',top:'895px'});
-CUES.whoosh.push({t:T.compare,d:0.2,k:'swish'},{t:T.compare+0.3,d:0.2,k:'swish'}); CUES.hits.push({t:T.compare+0.5,k:'soft'});
+CUES.hits.push({t:T.cmpAfter,k:'resolve'});
 function renderCmp(t){
   const a=T.compare;
-  const p1=eExpo(P(t,a,a+0.25)), p2=eExpo(P(t,a+0.3,a+0.55));
-  pTop.style.transform=`translateY(${lerp(-960,0,p1)}px)`; pBot.style.transform=`translateY(${lerp(960,0,p2)}px)`;
-  const ap=eBack(P(t,a+0.5,a+0.7)); arrow.style.transform=`scale(${ap})`; arrow.style.opacity=clamp(ap);
+  // 하드 컷으로 BEFORE → 다음 박자에 같은 프레임·같은 구도의 AFTER 가 하드 컷으로 들어옴 (매치 컷 · 스플릿 스크린)
+  const on2 = t>=T.cmpAfter;
+  pTop.style.transform=''; pBot.style.transform=''; pBot.style.opacity = on2?1:0;
+  pTop.style.filter = on2 ? `brightness(${lerp(1,0.8,P(t,T.cmpAfter,T.cmpAfter+0.5*T.beat))})` : '';
+  arrow.style.transform=''; arrow.style.opacity = on2?1:0;
   setTx(topBig,{o:1}); setTx(botBig,{o:1});
   // BEFORE: 흔들리는 겹친 창 + 헤매는 커서
   MW.forEach((m,i)=>{ const j=m.sh? Math.sin(t*38+i)*3 : 0; m.e.style.transform=`rotate(${m.r}deg) translate(${j}px,${m.sh?Math.cos(t*33+i)*2:0}px)`; });
-  const cu=((t-a)/0.28), ci=Math.floor(cu), cf=cu-ci, A=MCP[ci%MCP.length], B=MCP[(ci+1)%MCP.length], cp=eExpo(clamp(cf/0.35));
+  const cu=((t-a)/(0.5*T.beat)), ci=Math.floor(cu), cf=cu-ci, A=MCP[ci%MCP.length], B=MCP[(ci+1)%MCP.length], cp=eExpo(clamp(cf/0.35));
   mCur.style.left=lerp(A[0],B[0],cp)+'px'; mCur.style.top=lerp(A[1],B[1],cp)+'px';
   // AFTER: 규칙적으로 흘러 내려가는 카드 (열마다 같은 박자)
-  CC.forEach(c=>{ const u=((t-a)*1.1 + c.k/4 + c.col*0.08)%1; const y=150+u*300;
+  const ph=(t-a)/T.beat, stp=Math.floor(ph)+eExpo(clamp((ph%1)/0.4));   // 박자마다 한 칸씩 '착' 전진
+  CC.forEach(c=>{ const u=((stp + c.k)/4)%1; const y=150+u*300;
     c.e.style.top=y+'px'; c.e.style.opacity=clamp(Math.min(u/0.12,(1-u)/0.12)); });
 }
 
@@ -633,20 +720,21 @@ const core1 = bigText(Lcore, esc(C.core.first), 900, 92, 960, '#d6d6d6');
 function hl(s){const h=C.core.highlight; return h&&s.includes(h)? esc(s).replace(esc(h),`<span style="color:${C.brand.accent};position:relative">${esc(h)}<i class="ul" style="position:absolute;left:0;right:0;bottom:-6px;height:12px;background:${C.brand.accent};border-radius:6px;transform-origin:left;display:block"></i></span>`) : esc(s);}
 const core2 = C.core.second.map((s,i)=>bigText(Lcore, hl(s), 1000+i*185, 168));
 const uls=[...Lcore.querySelectorAll('.ul')];
-CUES.silence.push([T.core+0.55, T.core2]); CUES.hits.push({t:T.core,k:'soft'},{t:T.core2,k:'impact'});
+// 핵심 카피: 짧은 사일런스 드롭 → 박자 위에 두 번째 문장, 카메라 푸시인
+CUES.silence.push([T.core2-0.5*T.beat, T.core2]); CUES.hits.push({t:T.core,k:'soft'},{t:T.core2,k:'lift'});
 function renderCore(t){
-  const p=eExpo(P(t,T.core,T.core+0.35)); const m=eInOut(P(t,T.core2,T.core2+0.3));
-  setTx(core1,{o:clamp(P(t,T.core,T.core+0.15))*lerp(1,0.45,m), y:lerp(40,0,p)+lerp(0,-240,m), s:lerp(1,0.8,m)});
-  core2.forEach((e,i)=>punch(e,t,T.core2+i*0.12,1e9,1.35));
-  uls.forEach(u=>u.style.transform=`scaleX(${eCubic(P(t,T.core2+0.3,T.core2+0.6))})`);
+  const B=T.beat, p=eExpo(P(t,T.core,T.core+0.35)); const m=eInOut(P(t,T.core2,T.core2+0.5*B));
+  Lcore.style.transform=`scale(${1+0.045*eInOut(P(t,T.core2,T.cta))})`;
+  setTx(core1,{o:clamp(P(t,T.core,T.core+0.15))*lerp(1,0.45,m), y:lerp(24,0,p)+lerp(0,-240,m), s:lerp(1,0.8,m)});
+  core2.forEach((e,i)=>punch(e,t,T.core2+i*0.5*B,1e9,1.2));
+  uls.forEach(u=>u.style.transform=`scaleX(${eCubic(P(t,T.core2+1*B,T.core2+1.5*B))})`);
 }
 
 /* =====================================================================
    9) CTA
    ===================================================================== */
 const Lcta = layer();
-const ctaSvg = svgLayer(Lcta);
-const ctaLines=[...Array(24)].map((_,i)=>svgEl('path',{d:`M0,${80+i*80} L1080,${80+i*80}`,stroke:'#fff','stroke-width':1.5,opacity:.07},ctaSvg));
+const ctaBg = bgLayer(Lcta, 'cta');   // 정돈된 밝은 책상 실사 — '통제된 여유'
 const svc = mk('div','svc',Lcta,esc(C.cta.service)); svc.style.top='430px';
 const q = C.cta.question.map((s,i)=>bigText(Lcta, esc(s), 690+i*165, 140));
 const ring = mk('div','ring',Lcta); ring.style.top='1070px';
@@ -654,15 +742,15 @@ const btn = mk('div','btn',Lcta,esc(C.cta.button)); btn.style.top='1070px';
 { let s=56; btn.style.fontSize=s+'px'; while(btn.scrollWidth>840&&s>30){s-=2;btn.style.fontSize=s+'px';} }
 const brandBox = mk('div','abs',Lcta, `${C.brand.logo?`<img src="${C.brand.logo}" style="width:120px;height:120px;border-radius:30px;object-fit:contain">`:'<div class="logo-ph">LOGO</div>'}<div style="font-size:48px;font-weight:900;letter-spacing:-0.02em">${esc(C.brand.name)}</div>`);
 Object.assign(brandBox.style,{left:'0',right:'0',top:'1560px',display:'flex',alignItems:'center',justifyContent:'center',gap:'28px'});
-CUES.hits.push({t:T.cta,k:'soft'},{t:T.cta+0.25,k:'stab'},{t:T.cta+0.75,k:'impact2'});
+CUES.hits.push({t:T.cta,k:'resolve'},{t:T.cta+T.beat,k:'bell'});
 function renderCta(t){
-  const a=T.cta;
-  const p=eExpo(P(t,a,a+0.4)); svc.style.opacity=p; svc.style.transform=`translate(-50%,-50%) translateY(${lerp(40,0,p)}px)`;
-  q.forEach((e,i)=>punch(e,t,a+0.25+i*0.12,1e9,1.3));
-  const b=eBack(P(t,a+0.75,a+1.05)); btn.style.opacity=clamp(b); btn.style.transform=`translate(-50%,0) scale(${b*(1+0.02*Math.sin((t-a)*6)*P(t,a+1.2,a+1.5))})`;
-  const rp=((t-a-1.3)%1.2+1.2)%1.2/1.2; const on=t>a+1.3; ring.style.opacity=on?(1-rp)*0.6:0; ring.style.transform=`translate(-50%,0) scale(${1+rp*0.12},${1+rp*0.35})`;
-  const bp=eExpo(P(t,a+1.1,a+1.5)); brandBox.style.opacity=bp; brandBox.style.transform=`translateY(${lerp(30,0,bp)}px)`;
-  ctaLines.forEach((l,i)=>l.setAttribute('opacity',0.07*eCubic(P(t,a+i*0.02,a+0.4+i*0.02))));
+  const a=T.cta, B=T.beat;
+  ctaBg.draw(t-a, 1.0 + 0.03*P(t,a,T.end));            // 아주 느린 푸시인
+  const p=eExpo(P(t,a,a+0.4)); svc.style.opacity=p; svc.style.transform=`translate(-50%,-50%) translateY(${lerp(20,0,p)}px)`;
+  q.forEach((e,i)=>punch(e,t,a+0.5*B+i*0.5*B,1e9,1.15));
+  const b=eExpo(P(t,a+B,a+1.5*B)); btn.style.opacity=clamp(b); btn.style.transform=`translate(-50%,0) scale(${lerp(0.96,1,b)})`;
+  const rp=(((t-a-2*B)/(2*B))%1+1)%1; const on=t>a+2*B; ring.style.opacity=on?(1-rp)*0.45:0; ring.style.transform=`translate(-50%,0) scale(${1+rp*0.08},${1+rp*0.25})`;   // 2박마다 한 번, 조용히
+  const bp=eExpo(P(t,a+1.5*B,a+2*B)); brandBox.style.opacity=bp; brandBox.style.transform=`translateY(${lerp(20,0,bp)}px)`;
 }
 
 /* =====================================================================
@@ -671,7 +759,7 @@ function renderCta(t){
 const SCENES = [
   [Lhook, T.hook, T.stop, renderHook],
   [Lstop, T.stop, T.before, renderStop],
-  [Ldesk, T.before, T.turnMorph, (t)=>{ renderDesk(t, T.turn-0.001);
+  [Ldesk, T.before, T.turnMorph, (t)=>{ renderDesk(deskTime(t), DESK_END-0.0001);
       const fz=P(t,T.turn,T.turn+0.01); Ldesk.style.filter = t>=T.turn?'grayscale(1) brightness(.75)':''; Ldesk.style.transform=t>=T.turn?`scale(${1+0.03*P(t,T.turn,T.turnMorph)})`:''; }],
   [Lturn, T.turnMorph, T.after, renderTurn],
   [Lflow, T.after, T.result+0.2, renderFlow],
@@ -683,13 +771,16 @@ const SCENES = [
 function render(t){
   Lflow.style.zIndex=5; Ldash.style.zIndex=4;
   for(const [L,a,b,fn] of SCENES){ const on=t>=a&&t<b; L.style.display=on?'block':'none'; if(on) fn(t); }
-  // Turn 시작 시 선 레이어가 데스크톱에서 넘어오는 순간: 창 페이드
-  if(t>=T.turnMorph && t<T.turnMorph+0.3){ Ldesk.style.display='block'; renderDesk(t, T.turn-0.001); Ldesk.style.filter='grayscale(1) brightness(.75)'; Ldesk.style.opacity=1-P(t,T.turnMorph,T.turnMorph+0.3); }
+  // 분해 시작 순간: 정지된 데스크톱이 분해 조각 뒤로 사라짐
+  if(t>=T.turnMorph && t<T.turnMorph+0.3){ Ldesk.style.display='block'; renderDesk(deskTime(t), DESK_END-0.0001); Ldesk.style.filter='grayscale(1) brightness(.75)'; Ldesk.style.opacity=1-P(t,T.turnMorph,T.turnMorph+0.3); }
   else { Ldesk.style.opacity=1; }
   // 컷 전환 플래시 (구조 전환점)
-  flash.style.opacity = t>=T.turnText&&t<T.turnText+0.12 ? 0.35*(1-P(t,T.turnText,T.turnText+0.12)) : 0;
+  // 임팩트 프레임: 구조 완성 순간 2프레임만 밝게
+  flash.style.opacity = t>=T.turnText&&t<T.turnText+2/30 ? 0.16 : 0;
 }
 render(0);
+CUES.T = T;
+window.ASSETS_READY = Promise.all(bgImgsAll.map(im => im.decode().catch(() => {})));
 window.render = render; window.CUES = CUES; window.DURATION = C.duration || T.end;
 
 /* 미리보기: 브라우저에서 열면 자동 재생 (렌더링 시에는 ?render=1) */

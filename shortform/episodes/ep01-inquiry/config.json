@@ -4,7 +4,7 @@
   "title": "고객문의 편",
   "fps": 30,
   "duration": 25,
-  "bpm": 120,
+  "bpm": 110,
 
   "brand": {
     "name": "브랜드명",
@@ -36,6 +36,7 @@
   "stop": { "text": "아니요." },
 
   "before": {
+    "background": { "src": "assets/stock/pexels-7967182-darlene-alderson.mp4", "start": 1.0, "dim": 0.55, "blur": 5, "saturation": 0.45 },
     "counterLabel": "처리 대기 문의",
     "counterFrom": 12,
     "counterTo": 47,
@@ -49,7 +50,17 @@
     "chaosCaption": ["문제는 AI가", "없는 게 아니라"]
   },
 
-  "turn": { "text": "일의 구조입니다." },
+  "turn": {
+    "text": "일의 구조입니다.",
+    "modules": [
+      { "label": "문의", "sub": "들어오는 일" },
+      { "label": "분류", "sub": "유형 · 긴급도" },
+      { "label": "자동화", "sub": "반복 · 규칙" },
+      { "label": "판단", "sub": "사람이 결정" },
+      { "label": "예외", "sub": "규칙 밖" },
+      { "label": "전달", "sub": "담당자에게" }
+    ]
+  },
 
   "after": {
     "words": ["나누고.", "판단하고.", "필요한 곳에만 AI."],
@@ -107,6 +118,7 @@
   },
 
   "cta": {
+    "background": { "src": "assets/stock/pexels-6177738-cup-of-couple.mp4", "start": 2.0, "dim": 0.5, "blur": 3, "saturation": 0.8 },
     "service": "업무 구조화 · AI 워크플로 설계",
     "question": ["우리 업무도", "바꿀 수 있을까?"],
     "button": "크몽에서 업무 진단받기 →"
