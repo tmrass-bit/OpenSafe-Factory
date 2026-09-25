@@ -6,6 +6,7 @@
 <style>
   /* Zapier V2 전용. engine/template.html(EP01)과 완전히 분리된 독립 파일.
      사진은 항상 정지 — 움직이는 건 타이포/디자인 레이어(transform, opacity, clip-path, gradient)뿐. */
+  @font-face { font-family:'PretendardBlack'; font-weight:900; src:url('../assets/fonts/Pretendard-Black.otf') format('opentype'); }
   * { box-sizing:border-box; margin:0; padding:0; }
   html,body { background:#000; overflow:hidden; }
   body { font-family:'Noto Sans CJK KR','Noto Sans KR',sans-serif; color:#fff; -webkit-font-smoothing:antialiased; }
@@ -28,7 +29,7 @@
 </head>
 <body>
 <div id="stage"></div>
-<script>window.CONFIG={"_comment":"Zapier V2. V1(episodes/ep02-zapier)은 실패 시안으로 동결 — 이 config는 별도 산출물(out/ep02-zapier-v2)을 만든다.","episode":"ep02-zapier-v2","title":"Zapier V2 — 정지사진 + 타이포 모션","template":"minimal","fps":30,"duration":15,"brand":{"name":"Zapier","accent":"#FF4A00"},"open":{"text":"업무가 끊기는 순간.","highlight":"끊기는"},"before":{"items":[{"word":"받고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-12899096-mizuno-k.jpg","effect":"riseIn"},{"word":"옮기고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-7654588-folders.jpg","effect":"slideSnap"},{"word":"붙이고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-12911208-sticky-note.jpg","effect":"firstCharPop"},{"word":"알리고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-32959143-notifications.jpg","effect":"revealSweep"},{"word":"다시","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-8424576-passing-paper.jpg","effect":"scaleUp"}]},"turn":{"lines":["업무가 끊기는 곳은,","앱과 앱 사이."]},"proof":{"image":"file:///home/user/OpenSafe-Factory/shortform/assets/official/proof-trigger-action-action.png"},"climaxPhotos":{"badgo":{"word":"받고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-7964225-badgo.jpg","position":"68% 52%"},"itgo":{"word":"잇고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pixabay-3994018-itgo.jpg","position":"45% 45%"},"dahgo":{"word":"닿고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pixabay-4256272-dahgo.jpg","position":"42% 38%"},"daeum":{"word":"다음","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-8553950-daeum.jpg","position":"55% 42%"}},"close":{"lines":["어느 순간에도,","업무는 이어져야 하니까."]},"end":{"wordmark":"Zapier","logo":"file:///home/user/OpenSafe-Factory/shortform/assets/official/zapier-logo-frost.svg"}};window.BG={};window.AUDIO_SRC='music.wav';</script>
+<script>window.CONFIG={"_comment":"Zapier V2. V1(episodes/ep02-zapier)은 실패 시안으로 동결 — 이 config는 별도 산출물(out/ep02-zapier-v2)을 만든다.","episode":"ep02-zapier-v2","title":"Zapier V2 — 정지사진 + 타이포 모션","template":"minimal","fps":30,"duration":15,"brand":{"name":"Zapier","accent":"#FF4A00"},"open":{"text":"업무가 끊기는 순간.","highlight":"끊기는"},"before":{"items":[{"word":"받고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-12899096-mizuno-k.jpg","effect":"riseIn"},{"word":"옮기고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-7654588-folders.jpg","effect":"slideSnap"},{"word":"붙이고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-12911208-sticky-note.jpg","effect":"firstCharPop"},{"word":"알리고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-32959143-notifications.jpg","effect":"revealSweep"},{"word":"다시","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-8424576-passing-paper.jpg","effect":"scaleUp"}]},"turn":{"lines":["업무가 끊기는 곳은,","앱과 앱 사이."]},"proof":{"image":"file:///home/user/OpenSafe-Factory/shortform/assets/official/proof-trigger-action-action.png"},"climaxPhotos":{"badgo":{"word":"받고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/user-supplied-badgo.jpg"},"itgo":{"word":"잇고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pixabay-3994018-itgo.jpg"},"dahgo":{"word":"닿고","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/user-supplied-dahgo.jpg"},"daeum":{"word":"다음","image":"file:///home/user/OpenSafe-Factory/shortform/assets/stock/pexels-8553950-daeum.jpg"}},"close":{"lines":["어느 순간에도,","업무는 이어져야 하니까."]},"end":{"wordmark":"Zapier","logo":"file:///home/user/OpenSafe-Factory/shortform/assets/official/zapier-logo-frost.svg"}};window.BG={};window.AUDIO_SRC='music.wav';</script>
 <script>
 /* =====================================================================
    ZAPIER V2 — 정지사진 + 타이포 모션만으로 만드는 15초 minimal engine.
@@ -151,7 +152,6 @@ function renderClimax(t){
   Lclimax.innerHTML = '';
   const box = mk('div','climaxBox', Lclimax);
   const img = mk('img','climaxImg', box); if (C.proof && C.proof.image) img.src = C.proof.image;
-  const capLayer = mk('div', null, Lclimax);
 
   if (t < T.a1) { // 5.4–6.0: 진입, orange accent 강조, 텍스트 없음
     const p = eCubic(P(t, T.proofIn, T.proofIn + 0.25));
@@ -171,54 +171,73 @@ function renderClimax(t){
     ];
     let cur = beats[beats.length - 1];
     for (const beat of beats) { if (t >= beat[0] && t < beat[1]) { cur = beat; break; } }
-    const [a, b, key, photo, grade] = cur; const localT = t - a;
+    const [a, b, key, photo] = cur; const localT = t - a;
     if (!photo) return;
-    const pic = mk('img','photoFill', Lclimax); pic.src = photo.image; pic.style.objectPosition = photo.position || '50% 50%';
-    pic.style.filter = grade === 'bw'
-      ? 'grayscale(0.92) contrast(1.4) brightness(0.72)'      // 흑백 고대비, 깊은 암부 — 참고 이미지(받고/닿고)의 무드
-      : 'contrast(1.18) saturate(0.85) brightness(0.85)';     // 잇고/다음: 색 유지 + wash로 색언어 통일
-    if (grade === 'wash') {
-      const wash = mk('div', null, Lclimax);
-      Object.assign(wash.style, { position:'absolute', inset:0,
-        background:'linear-gradient(160deg, rgba(107,33,168,.4) 0%, rgba(219,39,119,.22) 45%, rgba(255,122,24,.22) 100%)',
-        mixBlendMode:'overlay' });
-    } else {
-      const wash = mk('div', null, Lclimax); // bw 컷도 미세한 purple/orange wash로 시리즈 색언어 통일(아주 약하게)
-      Object.assign(wash.style, { position:'absolute', inset:0,
-        background:'linear-gradient(160deg, rgba(107,33,168,.16) 0%, rgba(0,0,0,0) 50%, rgba(255,122,24,.1) 100%)',
-        mixBlendMode:'overlay' });
-    }
-    const vig = mk('div', null, Lclimax);
-    Object.assign(vig.style, { position:'absolute', inset:0, background:'radial-gradient(ellipse at center, rgba(0,0,0,0) 42%, rgba(0,0,0,.62) 100%)' });
-    const grain = mk('div','grain', Lclimax);
+    /* 레퍼런스(여행앱) 문법: 검정 바탕 + 중앙 16:9 이미지 밴드 + 밴드 한가운데 굵은 단어.
+       밴드 위치·단어 위치는 4컷 동일, 컷마다 색감·글자 크기·색·모션 에너지만 바뀐다. */
+    const BAND_W = 1080, BAND_H = 608, BAND_TOP = 960 - BAND_H / 2;
+    const band = mk('div', null, Lclimax);
+    Object.assign(band.style, { position:'absolute', left:0, top:BAND_TOP+'px', width:BAND_W+'px', height:BAND_H+'px', overflow:'hidden', background:'#000' });
+    const ART = {
+      // crop 위치 / 사진 grade / 색 wash / 단어 스타일
+      badgo: { pos:'50% 26%', filter:'grayscale(1) contrast(1.35) brightness(.85)',
+               wash:'linear-gradient(115deg,#5b1fb5 0%,#c2338f 55%,#ff7a3d 100%)', blend:'color', washOp:.62,
+               size:200, color:'white' },
+      itgo:  { pos:'50% 42%', filter:'blur(6px) contrast(.9) saturate(1.05) brightness(.56)', // 카드 아이콘 정보량을 눌러 타이포 우선
+               wash:'linear-gradient(115deg,#6a22e0 0%,#d4307f 60%,#e8702e 100%)', blend:'multiply', washOp:.7,
+               size:168, color:'white' },
+      dahgo: { pos:'62% 45%', filter:'contrast(1.6) saturate(1.25) brightness(.86)',
+               zoom:2.3, origin:'53% 40%', // 손가락-화면 접촉 지점 강한 crop
+               wash:'linear-gradient(115deg,#5b1fb5 0%,#c2338f 55%,#ff7a3d 100%)', blend:'soft-light', washOp:.85,
+               size:176, color:'white' },
+      daeum: { pos:'50% 38%', filter:'contrast(1.15) saturate(1.3) brightness(.8)',
+               wash:'linear-gradient(115deg,#4a1a9a 0%,#9a2a6e 55%,#b0552a 100%)', blend:'multiply', washOp:.6,
+               size:220, color:'gradient' },
+    }[key];
+    const pic = mk('img', null, band); pic.src = photo.image;
+    const settle = eCubic(P(localT, 0, 0.35));
+    Object.assign(pic.style, { position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover',
+      objectPosition: ART.pos, filter: ART.filter, transformOrigin: ART.origin || '50% 50%',
+      transform:`scale(${(ART.zoom || 1) * lerp(1.06, 1, settle)})` });
+    const wash = mk('div', null, band);
+    Object.assign(wash.style, { position:'absolute', inset:0, background:ART.wash, mixBlendMode:ART.blend, opacity:ART.washOp });
+    const vig = mk('div', null, band);
+    Object.assign(vig.style, { position:'absolute', inset:0, background:'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,.45) 100%)' });
+    const capLayer = mk('div', null, Lclimax); // 밴드보다 나중에 붙여야 위로 그려진다
 
     const wEl = mk('div','word', capLayer, esc(photo.word));
-    wEl.style.fontSize = '150px'; // 기존보다 크게
-    // 가로 위치를 컷마다 조금씩 변주(기계적 반복 방지), 사진 구도에 맞춰 배치
-    const topPos = { badgo: 1500, itgo: 1120, dahgo: 300, daeum: 1560 }[key] || 960;
-    wEl.style.top = topPos + 'px';
-    const gradientText = (moving) => {
-      wEl.style.background = 'linear-gradient(90deg,#B026FF 0%,#FF3D9A 45%,#FF7A18 100%)';
+    wEl.style.fontSize = ART.size + 'px';
+    wEl.style.fontWeight = '900';
+    wEl.style.fontFamily = "'PretendardBlack','Noto Sans CJK KR',sans-serif"; // 실제 Black 웨이트(합성 볼드 X)
+    wEl.style.letterSpacing = '-0.04em';
+    wEl.style.left = '540px';
+    wEl.style.top = '960px'; // 4컷 고정 위치
+    wEl.style.filter = 'drop-shadow(0 6px 22px rgba(0,0,0,.4))'; // 그라디언트 글자에도 적용되는 부드러운 분리감
+    if (ART.color === 'gradient') {
+      wEl.style.background = 'linear-gradient(90deg,#b565ff 0%,#ff5fae 50%,#ffb070 100%)';
       wEl.style.webkitBackgroundClip = 'text'; wEl.style.backgroundClip = 'text'; wEl.style.color = 'transparent';
-      if (moving != null) { wEl.style.backgroundSize = '220% 100%'; wEl.style.backgroundPosition = lerp(110, -20, moving) + '% 0'; }
-      else { wEl.style.backgroundSize = '100% 100%'; }
-    };
-    if (key === 'badgo') { // 받고: 아래에서 빠르게 들어오며 settle (흰 텍스트 — bw 사진 위 대비용)
-      const p = eCubic(P(localT, 0, 0.28));
-      wEl.style.color = '#fff';
-      wEl.style.opacity = p; wEl.style.transform = `translate(-50%,-50%) translateY(${lerp(60, 0, p)}px)`;
-    } else if (key === 'itgo') { // 잇고: 글자 내부 gradient 좌→우 ("연결" 방향성)
-      wEl.style.opacity = P(localT, 0, 0.15); gradientText(P(localT, 0, b - a));
-    } else if (key === 'dahgo') { // 닿고: 목적지 위치로 빠르게 이동 후 snap, scale은 아주 작게
-      const p = eBack(P(localT, 0, 0.3));
-      wEl.style.color = '#fff';
-      wEl.style.opacity = P(localT, 0, 0.15);
-      wEl.style.transform = `translate(-50%,-50%) translateX(${lerp(-70, 0, p)}px) scale(${lerp(0.96, 1, p)})`;
-    } else { // 다음: 앞 3컷보다 크게, 다음 단계로 미는 느낌(translate+scale)
-      const p = eCubic(P(localT, 0, 0.3));
-      gradientText(null);
+      wEl.style.backgroundSize = '200% 100%';
+    } else { wEl.style.color = '#fff'; }
+    if (key === 'badgo') { // 받고: 크게 찍히듯 등장(punch-in)
+      const p = eCubic(P(localT, 0, 0.12));
+      wEl.style.opacity = P(localT, 0, 0.05);
+      wEl.style.transform = `translate(-50%,-50%) scale(${lerp(1.32, 1, p)})`;
+    } else if (key === 'itgo') { // 잇고: 그라디언트가 좌→우로 흐르며 아래에서 올라옴
+      const p = eCubic(P(localT, 0, 0.22));
       wEl.style.opacity = p;
-      wEl.style.transform = `translate(-50%,-50%) translateX(${lerp(30, 0, p)}px) scale(${lerp(0.85, 1.08, p)})`;
+      wEl.style.backgroundPosition = lerp(100, 0, eCubic(P(localT, 0, 0.6))) + '% 0';
+      wEl.style.transform = `translate(-50%,-50%) translateY(${lerp(40, 0, p)}px)`;
+    } else if (key === 'dahgo') { // 닿고: 넓은 자간에서 한 점으로 모이며 snap
+      const p = eBack(P(localT, 0, 0.26));
+      wEl.style.opacity = P(localT, 0, 0.1);
+      wEl.style.letterSpacing = lerp(0.35, -0.04, clamp(p, 0, 1.2)) + 'em';
+      wEl.style.transform = `translate(-50%,-50%)`;
+    } else { // 다음: 가장 크게, 앞으로 밀어내듯 scale 오버슈트
+      const p1 = P(localT, 0, 0.14), p2 = P(localT, 0.14, 0.3);
+      const s = p2 > 0 ? lerp(1.06, 1.0, eCubic(p2)) : lerp(0.82, 1.06, eCubic(p1));
+      wEl.style.opacity = Math.max(p1 * 1.6, 0.001);
+      wEl.style.backgroundPosition = lerp(60, 0, eCubic(P(localT, 0, 0.5))) + '% 0';
+      wEl.style.transform = `translate(-50%,-50%) scale(${s})`;
     }
     return;
   }
@@ -262,7 +281,7 @@ function render(t){
 }
 render(0);
 window.CUES = { T };
-window.ASSETS_READY = Promise.resolve();
+window.ASSETS_READY = document.fonts.load("900 100px 'PretendardBlack'", '받고잇닿다음').catch(() => {});
 window.render = render;
 window.DURATION = C.duration || T.total;
 

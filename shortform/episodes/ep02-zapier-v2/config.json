@@ -25,10 +25,10 @@
   "proof": { "image": "assets/official/proof-trigger-action-action.png" },
 
   "climaxPhotos": {
-    "badgo": { "word": "받고", "image": "assets/stock/pexels-7964225-badgo.jpg",     "position": "68% 52%" },
-    "itgo":  { "word": "잇고", "image": "assets/stock/pixabay-3994018-itgo.jpg",     "position": "45% 45%" },
-    "dahgo": { "word": "닿고", "image": "assets/stock/pixabay-4256272-dahgo.jpg",    "position": "42% 38%" },
-    "daeum": { "word": "다음", "image": "assets/stock/pexels-8553950-daeum.jpg",     "position": "55% 42%" }
+    "badgo": { "word": "받고", "image": "assets/stock/user-supplied-badgo.jpg" },
+    "itgo":  { "word": "잇고", "image": "assets/stock/pixabay-3994018-itgo.jpg" },
+    "dahgo": { "word": "닿고", "image": "assets/stock/user-supplied-dahgo.jpg" },
+    "daeum": { "word": "다음", "image": "assets/stock/pexels-8553950-daeum.jpg" }
   },
 
   "close": { "lines": ["어느 순간에도,", "업무는 이어져야 하니까."] },
