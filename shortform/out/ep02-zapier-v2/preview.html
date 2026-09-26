@@ -19,7 +19,7 @@
   .word { position:absolute; left:50%; top:960px; transform:translate(-50%,-50%); font-weight:900; font-size:118px;
           letter-spacing:-0.03em; white-space:nowrap; will-change:transform,opacity; }
   .climaxBox { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:900px; height:590px;
-               overflow:hidden; border-radius:28px; border:2px solid #FF4A00; box-shadow:0 30px 80px rgba(0,0,0,.6); background:#0d0d0f; }
+               overflow:hidden; border-radius:28px; box-shadow:0 30px 80px rgba(0,0,0,.6); background:#0d0d0f; }
   .climaxImg { position:absolute; left:50%; top:0; }
   .wordmark { position:absolute; left:50%; top:960px; transform:translate(-50%,-50%); font-size:100px; font-weight:900; letter-spacing:-0.02em; }
   /* 아주 약한 film grain — 정적 노이즈 텍스처(모션 없음), climax 4컷의 cinematic grading용 */
@@ -159,7 +159,6 @@ function renderClimax(t){
   if (t < T.a1) { // 5.4–6.0: 진입, orange accent 강조, 텍스트 없음
     const p = eCubic(P(t, T.proofIn, T.proofIn + 0.25));
     box.style.opacity = p;
-    box.style.boxShadow = `0 0 ${lerp(0,70,p)}px rgba(255,74,0,${lerp(0,.55,p)}), 0 30px 80px rgba(0,0,0,.6)`;
     setClimaxCrop(img, 900, 590, 'full');
     return;
   }
