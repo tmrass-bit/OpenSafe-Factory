@@ -62,3 +62,13 @@ config 에 `"timeline": {"cta": 21.5}` 처럼 **초 단위**로 넣으면 됩니
 
 ## 필요 환경
 Node.js + `playwright`(Chromium), Python3 + numpy, ffmpeg, 한글 폰트(Noto Sans CJK KR)
+
+## 브랜드 필름 템플릿 (음악 없음 · 한 박자 한 단어)
+`engine/film.html` + `film.js` — 박자(b) 단위 `shots` 목록으로 실사 컷과 단어를 맞물립니다. 예: `episodes/ep02-moody-salon`
+```
+node film.js episodes/ep02-moody-salon              # 저해상도 프리뷰 540×960 → out/<ep>/<ep>_preview.mp4
+node film.js episodes/ep02-moody-salon --res 1080   # 최종 1080×1920 → <ep>_final.mp4
+node film.js episodes/ep02-moody-salon --frames 0,90  # 특정 프레임 스틸 확인
+```
+shot 옵션: `clip`(실사) · `t`(원본 시작 초) · `grade`(bw/warm) · `look`(black/mask 글자 속 실사/viewfinder/mirror) · `mode`(replace/stack) · `speed`(0.5 = 슬로모션) · `dim` · `flashIn`
+word 옵션: `text` · `en`/`idx`(캡션) · `pos`(tl/bl/c) · `size` 또는 `fit`(좌우 꽉 채움) · `anim`(slam/pop/rise/cut) · `color: accent` · `strike` · `badge`

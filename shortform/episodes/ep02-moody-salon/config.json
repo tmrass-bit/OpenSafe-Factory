@@ -1,0 +1,96 @@
+{
+  "_comment": "브랜드 필름 설정. 시간은 모두 박자(b) 단위, 128BPM 기준 1박 = 0.469초. shots 의 순서 = 화면 순서. 음악 없음(영상만).",
+  "episode": "ep02-moody-salon",
+  "title": "무디살롱 · 거울 편",
+  "template": "engine/film.html",
+  "fps": 30,
+  "bpm": 128,
+  "beats": 32,
+
+  "brand": {
+    "name": "무디살롱",
+    "latin": "MOODY SALON",
+    "line": ["거울이", "좋아지는 곳."],
+    "logo": null,
+    "accent": "#FF3B1F",
+    "issue": "No.01 — MIRROR"
+  },
+
+  "clips": {
+    "hand":    { "src": "assets/stock/mixkit-33599-man-touching-hair.mp4",       "x": 0.15 },
+    "phone":   { "src": "assets/stock/mixkit-1711-person-texting.mp4",          "x": 0.52 },
+    "mirror":  { "src": "assets/stock/mixkit-4515-woman-in-mirror.mp4",         "x": 0.70 },
+    "scissor": { "src": "assets/stock/mixkit-43232-barber-scissors-comb.mp4",   "x": 0.55 },
+    "dryer":   { "src": "assets/stock/mixkit-45893-blow-drying.mp4",            "x": 0.55 },
+    "flip":    { "src": "assets/stock/mixkit-16189-woman-playing-with-hair.mp4", "x": 0.50 },
+    "street":  { "src": "assets/stock/mixkit-21358-woman-walking-city.mp4",     "x": 0.52 },
+    "sunset":  { "src": "assets/stock/mixkit-4840-woman-sunset-rooftop.mp4",    "x": 0.58 }
+  },
+
+  "shots": [
+    { "b": 0, "look": "black", "label": "AM 07:42 — 오늘",
+      "words": [
+        { "b": 0, "text": "오늘,",   "anim": "slam", "pos": "c", "size": 300 },
+        { "b": 1, "text": "머리가",  "anim": "slam", "pos": "c", "size": 330 },
+        { "b": 2, "text": "안 된다.", "anim": "slam", "pos": "c", "fit": true, "shake": true }
+      ] },
+    { "b": 3, "clip": "hand", "t": 0.4, "grade": "bw", "label": "AM 07:43 — 거울 앞",
+      "words": [ { "b": 3, "text": "안 된다.", "anim": "hold", "pos": "c", "fit": true, "color": "accent", "blend": true } ] },
+
+    { "b": 4, "clip": "phone", "t": 1.5, "grade": "bw", "label": "PM 12:10 — 셀카",
+      "words": [
+        { "b": 4, "text": "셀카,", "en": "the selfie", "idx": "01", "pos": "bl", "anim": "pop", "size": 360 },
+        { "b": 5, "text": "삭제.", "en": "deleted", "idx": "02", "pos": "bl", "anim": "pop", "size": 360, "strike": true }
+      ] },
+    { "b": 6, "clip": "mirror", "t": 3.5, "grade": "bw", "label": "PM 06:30 — 거울",
+      "words": [
+        { "b": 6, "text": "거울,", "en": "the mirror", "idx": "03", "pos": "tl", "anim": "pop", "size": 360 },
+        { "b": 7, "text": "피하기.", "en": "avoided", "idx": "04", "pos": "tl", "anim": "pop", "fit": true }
+      ] },
+
+    { "b": 8, "look": "black", "mode": "stack", "pos": "c", "label": "—",
+      "words": [
+        { "b": 8, "text": "머리 문제가 아니었다.", "size": 64, "weight": "Medium", "anim": "cut", "dimAfter": 9 },
+        { "b": 9, "text": "기분 문제였다.", "anim": "slam", "fit": true }
+      ] },
+
+    { "b": 10, "clip": "scissor", "t": 3.2, "grade": "warm", "flashIn": true, "label": "MOODY SALON — 14:00",
+      "words": [ { "b": 10, "text": "싹둑.", "en": "snip", "idx": "05", "pos": "bl", "anim": "pop", "size": 420 } ] },
+    { "b": 11, "clip": "dryer", "t": 1.0, "grade": "warm", "label": "MOODY SALON — 14:40",
+      "words": [ { "b": 11, "text": "휘잉.", "en": "whoosh", "idx": "06", "pos": "tl", "anim": "pop", "size": 420 } ] },
+    { "b": 12, "clip": "flip", "t": 5.6, "grade": "warm", "look": "mask", "label": "MOODY SALON — 15:10",
+      "words": [ { "b": 12, "text": "찰랑.", "en": "swish", "idx": "07", "pos": "c", "anim": "pop", "fit": true } ] },
+
+    { "b": 13, "clip": "flip", "t": 9.6, "grade": "warm", "look": "viewfinder", "label": "PM 03:30 — 다시, 셀카",
+      "words": [
+        { "b": 13, "text": "셀카,", "en": "the selfie", "idx": "08", "pos": "bl", "anim": "pop", "size": 300 },
+        { "b": 14, "text": "저장.", "en": "saved", "idx": "09", "pos": "bl", "anim": "pop", "size": 300, "badge": "✓ 저장됨" }
+      ] },
+    { "b": 15, "clip": "flip", "t": 12.4, "grade": "warm", "look": "mirror", "label": "PM 03:31 — 다시, 거울",
+      "words": [
+        { "b": 15, "text": "거울,", "en": "the mirror", "idx": "10", "pos": "bl", "anim": "pop", "size": 300 },
+        { "b": 16, "text": "다시.", "en": "again", "idx": "11", "pos": "bl", "anim": "pop", "size": 300 },
+        { "b": 17, "text": "좋아.", "en": "i like it", "idx": "12", "pos": "bl", "anim": "pop", "size": 300, "color": "accent" }
+      ] },
+    { "b": 18, "clip": "street", "t": 0.6, "grade": "warm", "dim": 0.62, "label": "PM 04:00 — 밖으로",
+      "words": [
+        { "b": 18, "text": "고개,", "en": "chin up", "idx": "13", "pos": "tl", "anim": "pop", "size": 340 },
+        { "b": 19, "text": "들고,", "en": "and", "idx": "14", "pos": "tl", "anim": "pop", "size": 340 },
+        { "b": 20, "text": "나간다.", "en": "out the door", "idx": "15", "pos": "tl", "anim": "pop", "fit": true }
+      ] },
+
+    { "b": 21, "clip": "sunset", "t": 4.0, "grade": "warm", "speed": 0.5, "mode": "stack", "pos": "bl", "drift": true, "label": "MOODY SALON — ONE MONTH LATER",
+      "words": [
+        { "b": 21, "text": "머리 하나로,", "size": 96, "weight": "ExtraBold", "anim": "rise" },
+        { "b": 23, "text": "한 달이", "size": 250, "anim": "rise" },
+        { "b": 24, "text": "달라진다.", "fit": true, "anim": "rise", "color": "accent" }
+      ] },
+
+    { "b": 27, "look": "black", "mode": "stack", "pos": "c", "end": true, "label": "MOODY SALON",
+      "words": [
+        { "b": 27, "text": "거울이", "size": 210, "anim": "rise" },
+        { "b": 28, "text": "좋아지는 곳.", "fit": true, "anim": "rise" }
+      ],
+      "logoAt": 29.5, "sweepAt": 31 }
+  ]
+}

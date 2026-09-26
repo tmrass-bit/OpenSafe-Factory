@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<!-- 브랜드 필름 템플릿: 박자마다 한 단어 + 실사 컷. 연출 규칙은 여기, 내용은 episodes/<ep>/config.json -->
+<style>
+@font-face { font-family: P; font-weight: 500; src: url(../assets/fonts/Pretendard-Medium.woff2); }
+@font-face { font-family: P; font-weight: 800; src: url(../assets/fonts/Pretendard-ExtraBold.woff2); }
+@font-face { font-family: P; font-weight: 900; src: url(../assets/fonts/Pretendard-Black.woff2); }
+@font-face { font-family: I; font-style: italic; src: url(../assets/fonts/PlayfairDisplay-Italic.woff2); }
+:root { --ink: #0B0B0B; --paper: #F1EDE6; --accent: #FF3B1F; --m: 72px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); }
+#stage { position: absolute; inset: 0; overflow: hidden; font-family: P, sans-serif; color: var(--paper); }
+#stage.light { background: var(--paper); color: var(--ink); }
+#stage.dark { background: var(--ink); }
+
+/* 실사 */
+.bg { position: absolute; inset: 0; overflow: hidden; }
+.bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 45%; }
+.bg .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.15) 38%, rgba(0,0,0,0) 55%, rgba(0,0,0,.6) 100%); }
+/* 뷰파인더: 폰 화면 안에 실사 */
+.viewfinder .bg { inset: 190px 96px 640px; border-radius: 44px; }
+.viewfinder .vfui { position: absolute; inset: 190px 96px 640px; border-radius: 44px; box-shadow: 0 0 0 3px rgba(241,237,230,.9); }
+.vfui i { position: absolute; width: 64px; height: 64px; border: 0 solid var(--paper); }
+.vfui i:nth-child(1) { left: 40px; top: 40px; border-width: 4px 0 0 4px; }
+.vfui i:nth-child(2) { right: 40px; top: 40px; border-width: 4px 4px 0 0; }
+.vfui i:nth-child(3) { left: 40px; bottom: 40px; border-width: 0 0 4px 4px; }
+.vfui i:nth-child(4) { right: 40px; bottom: 40px; border-width: 0 4px 4px 0; }
+.vfui b { position: absolute; left: 50%; bottom: -120px; width: 96px; height: 96px; margin-left: -48px; border-radius: 50%; border: 6px solid var(--paper); }
+.vfui b::after { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: var(--paper); }
+/* 거울: 아치형 프레임 안에 좌우반전 실사 */
+.mirror .bg { inset: 190px 150px 700px; border-radius: 390px 390px 0 0; }
+.mirror .bg img { transform: scaleX(-1); }
+.mirror .bg .shade { display: none; }
+.mirror .arch { position: absolute; inset: 166px 126px 676px; border-radius: 414px 414px 0 0; border: 3px solid var(--ink); }
+/* 마스크: 글자 속에 실사 */
+.mask .bg { display: none; }
+
+/* 글자 */
+.words { position: absolute; left: var(--m); right: var(--m); display: flex; flex-direction: column; }
+.words.pos-bl { bottom: 250px; }
+.words.pos-tl { top: 210px; }
+.words.pos-c { top: 0; bottom: 0; justify-content: center; }
+.viewfinder .words.pos-bl, .mirror .words.pos-bl { bottom: 180px; }
+.w { font-weight: 900; line-height: .98; letter-spacing: -.045em; white-space: nowrap; transform-origin: 0 60%; position: relative; align-self: flex-start; }
+.pos-c .w { text-align: left; }
+.w.accent { color: var(--accent); }
+.w.blend { mix-blend-mode: normal; }
+.w .strike { position: absolute; left: -12px; right: -12px; top: 52%; height: .1em; background: var(--accent); transform-origin: 0 50%; }
+.mask .w { color: transparent; -webkit-background-clip: text; background-clip: text; background-size: cover; background-position: 50% 40%; }
+.cap { display: flex; align-items: baseline; gap: 22px; margin-bottom: 18px; font-size: 30px; }
+.cap .idx { font-weight: 800; color: var(--accent); letter-spacing: .08em; }
+.cap .en { font-family: I; font-style: italic; font-size: 40px; opacity: .9; }
+.cap .rule { flex: 1; height: 2px; background: currentColor; opacity: .5; align-self: center; }
+.badge { position: absolute; left: 50%; top: 250px; transform: translateX(-50%); background: var(--accent); color: var(--paper); font-weight: 800; font-size: 36px; padding: 16px 34px; border-radius: 999px; letter-spacing: -.01em; }
+
+/* 엔딩 */
+.logo { position: absolute; left: var(--m); right: var(--m); bottom: 250px; display: flex; align-items: center; gap: 36px; }
+.logo .slot { width: 150px; height: 150px; border: 3px dashed rgba(241,237,230,.55); display: grid; place-items: center; font-size: 22px; letter-spacing: .3em; opacity: .8; }
+.logo .slot img { width: 100%; height: 100%; object-fit: contain; }
+.logo .name { font-weight: 900; font-size: 88px; letter-spacing: -.04em; line-height: 1; }
+.logo .latin { font-weight: 800; font-size: 24px; letter-spacing: .5em; opacity: .7; margin-top: 14px; }
+.sweep { position: absolute; left: 0; height: 10px; bottom: 200px; background: var(--accent); }
+
+/* 포스터 크롬: 모든 프레임에 고정 */
+.chrome { position: absolute; left: var(--m); right: var(--m); font-size: 24px; font-weight: 800; letter-spacing: .28em; display: flex; justify-content: space-between; text-transform: uppercase; }
+.chrome.top { top: 84px; }
+.chrome.bot { bottom: 92px; letter-spacing: .16em; }
+.chrome .it { font-family: I; font-style: italic; font-weight: 700; letter-spacing: .02em; font-size: 30px; text-transform: none; }
+.hair { position: absolute; left: var(--m); right: var(--m); height: 2px; background: currentColor; opacity: .35; }
+.hair.t { top: 140px; } .hair.b { bottom: 146px; }
+#flash { position: absolute; inset: 0; background: var(--paper); opacity: 0; pointer-events: none; }
+#grain { position: absolute; inset: -40px; opacity: .10; mix-blend-mode: overlay; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+</style></head>
+<body><div id="stage"></div><div id="flash"></div><div id="grain"></div>
+<script>
+const C = window.CONFIG, FR = window.FRAMES || {};
+const BEAT = 60 / C.bpm, FPS = C.fps || 30, DUR = C.beats * BEAT;
+document.documentElement.style.setProperty('--accent', C.brand.accent);
+const stage = document.getElementById('stage'), flash = document.getElementById('flash'), grain = document.getElementById('grain');
+const shots = C.shots.map((s, i) => ({ ...s, i, e: (C.shots[i + 1] || { b: C.beats }).b }));
+const ease = x => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
+let cur = null, words = [];
+
+function build(s) {
+  const look = s.look || 'photo', light = look === 'mask' || look === 'mirror';
+  stage.className = (light ? 'light ' : 'dark ') + look;
+  let h = '';
+  if (s.clip) h += `<div class="bg"><img><div class="shade"></div></div>`;
+  if (look === 'viewfinder') h += `<div class="vfui"><i></i><i></i><i></i><i></i><b></b></div>`;
+  if (look === 'mirror') h += `<div class="arch"></div>`;
+  h += `<div class="words pos-${s.pos || 'c'}"></div>`;
+  if (s.end) h += `<div class="logo" style="opacity:0"><div class="slot">${C.brand.logo ? `<img src="../${C.brand.logo}">` : 'LOGO'}</div>
+      <div><div class="name">${C.brand.name}</div><div class="latin">${C.brand.latin}</div></div></div><div class="sweep" style="width:0"></div>`;
+  h += `<div class="hair t"></div><div class="hair b"></div>
+    <div class="chrome top"><span>${C.brand.latin}</span><span class="it">${C.brand.issue}</span></div>
+    <div class="chrome bot"><span class="lab"></span><span class="cnt"></span></div><div class="badge" style="display:none"></div>`;
+  stage.innerHTML = h;
+  stage.querySelector('.lab').textContent = s.label || '';
+  if (s.dim && s.clip) stage.querySelector('.bg img').style.filter = `brightness(${s.dim})`;
+  words = [];
+}
+
+// 글자 크기: size 지정값, fit 이면 좌우 여백 안을 꽉 채움
+function sizeWord(el, w) {
+  const avail = 1080 - 2 * 72;
+  if (!w.fit) { el.style.fontSize = (w.size || 300) + 'px'; if (el.scrollWidth > avail) el.style.fontSize = (w.size || 300) * avail / el.scrollWidth + 'px'; return; }
+  el.style.fontSize = '200px'; el.style.fontSize = 200 * avail / el.scrollWidth + 'px';
+}
+
+function addWord(s, w) {
+  const box = stage.querySelector('.words');
+  if ((s.mode || 'replace') === 'replace') { box.innerHTML = ''; words = []; }
+  let cap = null;
+  if (w.en || w.idx) { cap = document.createElement('div'); cap.className = 'cap';
+    cap.innerHTML = `<span class="idx">${w.idx || ''}</span><span class="en">${w.en || ''}</span><span class="rule"></span>`; box.appendChild(cap); }
+  const el = document.createElement('div'); el.className = 'w' + (w.color === 'accent' ? ' accent' : '');
+  el.style.fontWeight = { Medium: 500, ExtraBold: 800 }[w.weight] || 900;
+  el.textContent = w.text; box.appendChild(el); sizeWord(el, w);
+  if (w.strike) { const k = document.createElement('div'); k.className = 'strike'; el.appendChild(k); }
+  const badge = stage.querySelector('.badge');
+  badge.style.display = w.badge ? 'block' : 'none'; if (w.badge) badge.textContent = w.badge;
+  words.push({ w, el, cap });
+}
+
+async function render(t) {
+  const b = t / BEAT, s = shots.find(x => b >= x.b && b < x.e) || shots[shots.length - 1];
+  if (cur !== s) { build(s); cur = s; }
+  // 새 박자 단어 추가
+  for (const w of s.words) if (b >= w.b && !words.some(x => x.w === w)) addWord(s, w);
+  const img = stage.querySelector('.bg img');
+  const fr = s.clip && FR[s.i];
+  if (fr) {
+    const n = Math.min(fr.count, Math.floor((t - s.b * BEAT) * FPS) + 1);
+    const src = fr.base + String(Math.max(1, n)).padStart(3, '0') + '.jpg';
+    if (img.getAttribute('src') !== src) { img.src = src; await img.decode().catch(() => {}); }
+    const p = (b - s.b) / (s.e - s.b), since = (b - Math.floor(b)) * BEAT * FPS;
+    const punch = s.drift ? 0 : 0.035 * Math.exp(-since / 3);
+    const flip = s.look === 'mirror' ? 'scaleX(-1) ' : '';
+    img.style.transform = `${flip}scale(${1.04 + (s.drift ? 0.08 : 0.05) * p + punch})`;
+    if (s.look === 'mask') for (const x of words) x.el.style.backgroundImage = `url(${src})`;
+  }
+  // 단어 애니메이션 (프레임 단위)
+  for (const x of words) {
+    const f = (b - x.w.b) * BEAT * FPS, el = x.el;
+    let tr = '', op = 1;
+    const a = x.w.anim || 'pop';
+    if (a === 'slam') { const k = ease(f / 3); tr = `scale(${1.28 - .28 * k})`;
+      if (x.w.shake && f < 6) tr += ` translate(${[14, -12, 9, -6, 3, 0][Math.floor(f)] || 0}px, ${[-8, 10, -5, 4, -2, 0][Math.floor(f)] || 0}px)`; }
+    else if (a === 'pop') tr = `scale(${1.07 - .07 * ease(f / 4)})`;
+    else if (a === 'rise') { const k = ease(f / 9); tr = `translateY(${40 * (1 - k)}px)`; op = k; }
+    if (x.w.dimAfter != null && b >= x.w.dimAfter) op = .38;
+    el.style.transform = tr; el.style.opacity = op;
+    if (x.cap) { x.cap.style.opacity = Math.min(1, f / 3); }
+    const k = el.querySelector('.strike'); if (k) k.style.transform = `scaleX(${ease((f - 3) / 4)})`;
+  }
+  if (s.end) {
+    const lf = (b - s.logoAt) * BEAT * FPS, lg = stage.querySelector('.logo');
+    lg.style.opacity = ease(lf / 10); lg.style.transform = `translateY(${30 * (1 - ease(lf / 10))}px)`;
+    stage.querySelector('.words').style.transform = `translateY(${-170 * ease(lf / 12)}px)`;
+    stage.querySelector('.sweep').style.width = 1080 * ease((b - s.sweepAt) * BEAT * FPS / 8) + 'px';
+  }
+  const bi = Math.min(C.beats, Math.floor(b) + 1);
+  stage.querySelector('.cnt').textContent = String(bi).padStart(2, '0') + ' / ' + C.beats;
+  flash.style.opacity = s.flashIn ? Math.max(0, 1 - (b - s.b) * BEAT * FPS / 3) : 0;
+  const g = Math.floor(t * FPS); grain.style.transform = `translate(${(g * 37) % 40 - 20}px, ${(g * 53) % 40 - 20}px)`;
+}
+window.render = render; window.DUR = DUR;
+
+// 미리보기(브라우저): 실시간 재생, 클릭하면 처음부터
+if (!location.search.includes('render')) {
+  let t0 = performance.now();
+  document.body.onclick = () => t0 = performance.now();
+  (async function loop() { await render(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); })();
+}
+</script></body></html>

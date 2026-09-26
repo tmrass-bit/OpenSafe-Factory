@@ -2,3 +2,4 @@ node_modules/
 out/*/video_noaudio.mp4
 out/*/still_*.png
 out/*/bg_*/
+out/*/shots/
