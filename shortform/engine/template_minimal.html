@@ -184,7 +184,7 @@ function renderClimax(t){
                size:200, color:'white' },
       itgo:  { pos:'50% 42%', filter:'blur(6px) contrast(.9) saturate(1.05) brightness(.56)', // 카드 아이콘 정보량을 눌러 타이포 우선
                wash:'linear-gradient(115deg,#6a22e0 0%,#d4307f 60%,#e8702e 100%)', blend:'multiply', washOp:.7,
-               size:168, color:'white' },
+               size:200, color:'split' }, // Zapier 로고급 존재감 — "잇"은 흰색/"고"는 오렌지로 색 분리(아래에서 적용)
       dahgo: { pos:'62% 45%', filter:'contrast(1.6) saturate(1.25) brightness(.86)',
                zoom:2.3, origin:'53% 40%', // 손가락-화면 접촉 지점 강한 crop
                wash:'linear-gradient(115deg,#5b1fb5 0%,#c2338f 55%,#ff7a3d 100%)', blend:'soft-light', washOp:.85,
@@ -216,15 +216,18 @@ function renderClimax(t){
       wEl.style.background = 'linear-gradient(90deg,#b565ff 0%,#ff5fae 50%,#ffb070 100%)';
       wEl.style.webkitBackgroundClip = 'text'; wEl.style.backgroundClip = 'text'; wEl.style.color = 'transparent';
       wEl.style.backgroundSize = '200% 100%';
+    } else if (ART.color === 'split') {
+      // Zapier wordmark처럼 단단한 2색 조합: "잇"=흰색, "고"=Zapier 오렌지. 움직이는 그라디언트 없음.
+      const chars = [...photo.word];
+      wEl.innerHTML = `<span style="color:#fff">${esc(chars[0])}</span><span style="color:#FF4A00">${esc(chars.slice(1).join(''))}</span>`;
     } else { wEl.style.color = '#fff'; }
     if (key === 'badgo') { // 받고: 크게 찍히듯 등장(punch-in)
       const p = eCubic(P(localT, 0, 0.12));
       wEl.style.opacity = P(localT, 0, 0.05);
       wEl.style.transform = `translate(-50%,-50%) scale(${lerp(1.32, 1, p)})`;
-    } else if (key === 'itgo') { // 잇고: 그라디언트가 좌→우로 흐르며 아래에서 올라옴
+    } else if (key === 'itgo') { // 잇고: 아래에서 올라오며 settle (색은 고정된 흰/오렌지 분리, 움직이는 그라디언트 없음)
       const p = eCubic(P(localT, 0, 0.22));
       wEl.style.opacity = p;
-      wEl.style.backgroundPosition = lerp(100, 0, eCubic(P(localT, 0, 0.6))) + '% 0';
       wEl.style.transform = `translate(-50%,-50%) translateY(${lerp(40, 0, p)}px)`;
     } else if (key === 'dahgo') { // 닿고: 넓은 자간에서 한 점으로 모이며 snap
       const p = eBack(P(localT, 0, 0.26));
