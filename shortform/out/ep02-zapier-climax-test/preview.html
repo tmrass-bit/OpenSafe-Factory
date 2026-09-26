@@ -182,14 +182,14 @@ function renderClimax(t){
       // crop 위치 / 사진 grade / 색 wash / 단어 스타일
       badgo: { pos:'50% 26%', filter:'grayscale(1) contrast(1.35) brightness(.85)',
                wash:'linear-gradient(115deg,#5b1fb5 0%,#c2338f 55%,#ff7a3d 100%)', blend:'color', washOp:.62,
-               size:200, color:'white' },
+               size:200, color:'split', accent:'#8B3BFF' }, // "받"은 흰색, "고"만 보라
       itgo:  { pos:'50% 42%', filter:'blur(6px) contrast(.9) saturate(1.05) brightness(.56)', // 카드 아이콘 정보량을 눌러 타이포 우선
                wash:'linear-gradient(115deg,#6a22e0 0%,#d4307f 60%,#e8702e 100%)', blend:'multiply', washOp:.7,
-               size:200, color:'split' }, // Zapier 로고급 존재감 — "잇"은 흰색/"고"는 오렌지로 색 분리(아래에서 적용)
+               size:200, color:'split', accent:'#FF4A00' }, // "잇"은 흰색, "고"만 Zapier 오렌지
       dahgo: { pos:'62% 45%', filter:'contrast(1.6) saturate(1.25) brightness(.86)',
                zoom:2.3, origin:'53% 40%', // 손가락-화면 접촉 지점 강한 crop
                wash:'linear-gradient(115deg,#5b1fb5 0%,#c2338f 55%,#ff7a3d 100%)', blend:'soft-light', washOp:.85,
-               size:176, color:'white' },
+               size:176, color:'split', accent:'#FF4FA8' }, // "닿"은 흰색, "고"만 분홍
       daeum: { pos:'50% 38%', filter:'contrast(1.15) saturate(1.3) brightness(.8)',
                wash:'linear-gradient(115deg,#4a1a9a 0%,#9a2a6e 55%,#b0552a 100%)', blend:'multiply', washOp:.6,
                size:220, color:'gradient' },
@@ -218,9 +218,9 @@ function renderClimax(t){
       wEl.style.webkitBackgroundClip = 'text'; wEl.style.backgroundClip = 'text'; wEl.style.color = 'transparent';
       wEl.style.backgroundSize = '200% 100%';
     } else if (ART.color === 'split') {
-      // Zapier wordmark처럼 단단한 2색 조합: "잇"=흰색, "고"=Zapier 오렌지. 움직이는 그라디언트 없음.
+      // Zapier wordmark처럼 단단한 2색 조합: 앞 글자는 흰색, "고"만 포인트 컬러. 움직이는 그라디언트 없음.
       const chars = [...photo.word];
-      wEl.innerHTML = `<span style="color:#fff">${esc(chars[0])}</span><span style="color:#FF4A00">${esc(chars.slice(1).join(''))}</span>`;
+      wEl.innerHTML = `<span style="color:#fff">${esc(chars.slice(0, -1).join(''))}</span><span style="color:${ART.accent}">${esc(chars[chars.length - 1])}</span>`;
     } else { wEl.style.color = '#fff'; }
     if (key === 'badgo') { // 받고: 크게 찍히듯 등장(punch-in)
       const p = eCubic(P(localT, 0, 0.12));
