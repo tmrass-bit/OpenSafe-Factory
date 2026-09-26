@@ -75,7 +75,8 @@ function renderOpen(t){
   const idx = full.indexOf(hi);
   const pre = idx >= 0 ? full.slice(0, idx) : full, post = idx >= 0 ? full.slice(idx + hi.length) : '';
   const wrap = mk('div','cap', Lopen, `<span>${esc(pre)}</span><span id="ohi">${esc(hi)}</span><span>${esc(post)}</span>`);
-  wrap.style.fontSize = '80px';
+  wrap.style.fontSize = '96px';
+  wrap.style.fontFamily = "'PretendardBlack','Noto Sans CJK KR',sans-serif";
   const reveal = eCubic(P(t, 0, 0.18));
   wrap.style.clipPath = `inset(0 ${lerp(100, 0, reveal)}% 0 0)`;
   const hiEl = wrap.querySelector('#ohi');
@@ -93,7 +94,8 @@ function renderBefore(t){
   const img = mk('img','photoFill', Lbefore); img.src = item.image;
   mk('div','dim', Lbefore).style.opacity = 0.32;
   const capEl = mk('div','cap', Lbefore, esc(item.word));
-  capEl.style.fontSize = '104px';
+  capEl.style.fontSize = '180px'; // 잇고(200px)보다 조금 작게
+  capEl.style.fontFamily = "'PretendardBlack','Noto Sans CJK KR',sans-serif";
   switch (item.effect) {
     case 'riseIn': { // 받고: translateY 35→0 + opacity 0→1
       const p = eCubic(P(localT, 0, 0.35));
@@ -130,7 +132,8 @@ function renderTurn(t){
   mk('div','dim', Lturn).style.background = '#050506';
   const lines = (C.turn && C.turn.lines) || [];
   const cap = mk('div','cap', Lturn, lines.map(esc).join('<br>'));
-  cap.style.fontSize = '70px'; cap.style.color = '#fff';
+  cap.style.fontSize = '92px'; cap.style.color = '#fff';
+  cap.style.fontFamily = "'PretendardBlack','Noto Sans CJK KR',sans-serif";
   const p = eCubic(P(t, T.turn, T.turn + 0.15)); // 등장 이후엔 P가 1로 고정되어 완전 정지
   cap.style.opacity = p;
   cap.style.transform = `translate(-50%,-50%) translateY(${lerp(18, 0, p)}px)`;
@@ -254,9 +257,11 @@ function renderClose(t){
   mk('div','dim', Lclose).style.background = '#0a0a0c';
   const lines = (C.close && C.close.lines) || [];
   const half = (T.end - T.close) / 2;
-  if (lines[0]) { const e1 = mk('div','cap', Lclose, esc(lines[0])); e1.style.fontSize='68px'; e1.style.top='860px';
+  if (lines[0]) { const e1 = mk('div','cap', Lclose, esc(lines[0])); e1.style.fontSize='82px'; e1.style.top='840px';
+    e1.style.fontFamily = "'PretendardBlack','Noto Sans CJK KR',sans-serif";
     const p = eCubic(P(t, T.close, T.close + 0.6)); e1.style.opacity = p; e1.style.transform = `translate(-50%,-50%) translateY(${lerp(20,0,p)}px)`; }
-  if (lines[1] && t >= T.close + half * 0.5) { const e2 = mk('div','cap', Lclose, esc(lines[1])); e2.style.fontSize='68px'; e2.style.top='1000px';
+  if (lines[1] && t >= T.close + half * 0.5) { const e2 = mk('div','cap', Lclose, esc(lines[1])); e2.style.fontSize='82px'; e2.style.top='1020px';
+    e2.style.fontFamily = "'PretendardBlack','Noto Sans CJK KR',sans-serif";
     const p = eCubic(P(t, T.close + half * 0.5, T.close + half * 0.5 + 0.6)); e2.style.opacity = p; e2.style.transform = `translate(-50%,-50%) translateY(${lerp(20,0,p)}px)`; }
 }
 function renderEnd(t){
@@ -284,7 +289,8 @@ function render(t){
 }
 render(0);
 window.CUES = { T };
-window.ASSETS_READY = document.fonts.load("900 100px 'PretendardBlack'", '받고잇닿다음').catch(() => {});
+window.ASSETS_READY = document.fonts.load("900 100px 'PretendardBlack'",
+  '업무가끊기는순간받고옮붙이알리다시앱과사이잇닿다음어느에도이어져야하니까').catch(() => {});
 window.render = render;
 window.DURATION = C.duration || T.total;
 
